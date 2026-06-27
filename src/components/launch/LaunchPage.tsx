@@ -1,7 +1,5 @@
 "use client"
 
-import HeroPrompt from "@/components/launch/HeroPrompt"
-import LaunchCountdown from "@/components/launch/LaunchCountdown"
 import { launchContent } from "@/content/launch"
 import type { LaunchPhaseStatus } from "@/content/launch"
 
@@ -28,7 +26,7 @@ export default function LaunchPage() {
     <div className="page">
       <nav className="nav" aria-label="Principal">
         <div className="nav-inner">
-          <a href="#inicio" className="nav-logo">
+          <a href="#inicio" className="nav-logo" aria-label="CaribeLLM archipielago — inicio">
             {brand.prefix}
             <span className="a">{brand.accent}</span>
             <span className="s">/</span>
@@ -56,9 +54,8 @@ export default function LaunchPage() {
       </nav>
 
       <div className="wrap">
+        {/* ── HERO ── */}
         <section className="hero" id="inicio" aria-labelledby="launch-title">
-          <LaunchCountdown />
-
           <h1 id="launch-title">
             <span className="title-line">{hero.title}</span>
             <span className="title-line title-accent">
@@ -66,8 +63,6 @@ export default function LaunchPage() {
               <span className="title-highlight">{hero.titleAccentHighlight}</span>
             </span>
           </h1>
-
-          <HeroPrompt text={hero.prompt} />
 
           <p className="hero-sub">{hero.lede}</p>
 
@@ -95,6 +90,28 @@ export default function LaunchPage() {
           </div>
         </section>
 
+        {/* ── TERMINAL DEMO ── */}
+        <div className="term-demo" aria-label="Ejemplo de integración">
+          <div className="term-bar" aria-hidden="true">
+            <span className="term-dot dot-r" />
+            <span className="term-dot dot-y" />
+            <span className="term-dot dot-g" />
+            <span className="term-label">bash</span>
+          </div>
+          <div className="term-body">
+            <p className="term-line">
+              <span className="term-prompt">$</span>
+              <span className="term-cmd">{" export OPENAI_BASE_URL="}</span>
+              <span className="term-url">{"https://api.caribellm.com"}</span>
+            </p>
+            <p className="term-line term-comment-line">
+              <span className="term-prompt">$</span>
+              <span className="term-comment">{" # tu código de OpenAI funciona igual"}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* ── MISSION ── */}
         <section id={mission.id} className="section" aria-labelledby="mission-title">
           <p className="eyebrow">{mission.eyebrow}</p>
           <h2 id="mission-title">
@@ -115,6 +132,7 @@ export default function LaunchPage() {
           </div>
         </section>
 
+        {/* ── PHASES ── */}
         <section id={phases.id} className="section section-last" aria-labelledby="phases-title">
           <p className="eyebrow">{phases.eyebrow}</p>
           <h2 id="phases-title">
@@ -144,7 +162,8 @@ export default function LaunchPage() {
           ))}
 
           <p className="roadmap-note">
-            <span>//</span> {phases.note}
+            <span aria-hidden="true">{"// "}</span>
+            {phases.note}
           </p>
         </section>
 
@@ -174,7 +193,7 @@ export default function LaunchPage() {
           --launch-surface: #0f1414;
           --launch-border: #1c2424;
           --launch-text: #e8edec;
-          --launch-muted: #4a5a58;
+          --launch-muted: #8aaba7;
           --launch-accent: #00cfbd;
           --launch-dim: #008f82;
           --launch-green: #22c55e;
@@ -187,18 +206,19 @@ export default function LaunchPage() {
           line-height: 1.6;
         }
 
+        /* ── NAV ── */
         .nav {
           position: fixed;
           inset: 0 0 auto 0;
           z-index: 100;
-          background: rgba(8, 11, 11, 0.88);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
+          background: var(--launch-bg);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
           border-bottom: 1px solid var(--launch-border);
         }
 
         .nav-inner {
-          max-width: 820px;
+          max-width: 760px;
           margin: 0 auto;
           padding: 0 24px;
           height: 52px;
@@ -220,8 +240,11 @@ export default function LaunchPage() {
           color: var(--launch-accent);
         }
 
+        /* "/" rendered as intentional typographic mark */
         .nav-logo :global(.s) {
-          color: var(--launch-muted);
+          color: var(--launch-dim);
+          font-weight: 400;
+          margin: 0 1px;
         }
 
         .nav-links {
@@ -249,33 +272,35 @@ export default function LaunchPage() {
           font-weight: 500;
         }
 
+        /* ── LAYOUT ── */
         .wrap {
-          max-width: 820px;
+          max-width: 760px;
           margin: 0 auto;
           padding: 0 24px;
         }
 
+        /* ── HERO ── */
         .hero {
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          padding-top: 108px;
-          padding-bottom: 80px;
+          padding-top: 120px;
+          padding-bottom: 72px;
           border-bottom: 1px solid var(--launch-border);
         }
 
         .hero h1 {
           display: flex;
           flex-direction: column;
-          gap: 0.08em;
+          gap: 0.06em;
           font-family: var(--app-title-font);
           font-size: clamp(40px, 6.5vw, 72px);
           font-weight: 700;
           line-height: 1.04;
           letter-spacing: -0.035em;
-          margin: 0 auto 20px;
-          max-width: 720px;
+          margin: 0 auto 24px;
+          max-width: 680px;
         }
 
         .hero h1 :global(.title-line) {
@@ -295,9 +320,9 @@ export default function LaunchPage() {
         .hero-sub {
           font-size: 17px;
           color: var(--launch-muted);
-          line-height: 1.7;
-          max-width: 520px;
-          margin: 0 auto 40px;
+          line-height: 1.65;
+          max-width: 500px;
+          margin: 0 auto 36px;
         }
 
         .hero-actions {
@@ -305,7 +330,7 @@ export default function LaunchPage() {
           gap: 10px;
           flex-wrap: wrap;
           justify-content: center;
-          margin-bottom: 48px;
+          margin-bottom: 40px;
         }
 
         .btn-primary {
@@ -361,8 +386,85 @@ export default function LaunchPage() {
           letter-spacing: 0.02em;
         }
 
+        /* ── TERMINAL DEMO ── */
+        .term-demo {
+          max-width: 560px;
+          margin: 48px auto 0;
+          background: var(--launch-surface);
+          border: 1px solid var(--launch-border);
+          overflow: hidden;
+        }
+
+        .term-bar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 14px;
+          border-bottom: 1px solid var(--launch-border);
+          background: rgba(255, 255, 255, 0.02);
+        }
+
+        .term-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .dot-r {
+          background: #ff5f57;
+        }
+
+        .dot-y {
+          background: #ffbd2e;
+        }
+
+        .dot-g {
+          background: #28ca41;
+        }
+
+        .term-label {
+          font-family: var(--app-mono);
+          font-size: 11px;
+          color: var(--launch-muted);
+          margin-left: 4px;
+          letter-spacing: 0.06em;
+        }
+
+        .term-body {
+          padding: 16px 18px 18px;
+        }
+
+        .term-line {
+          font-family: var(--app-mono);
+          font-size: 13px;
+          line-height: 1.8;
+          margin: 0;
+          white-space: pre;
+          overflow-x: auto;
+        }
+
+        .term-prompt {
+          color: var(--launch-green);
+          font-weight: 600;
+          user-select: none;
+        }
+
+        .term-cmd {
+          color: var(--launch-text);
+        }
+
+        .term-url {
+          color: var(--launch-accent);
+        }
+
+        .term-comment {
+          color: var(--launch-muted);
+        }
+
+        /* ── SECTIONS ── */
         .section {
-          padding: 80px 0;
+          padding: 72px 0;
           border-bottom: 1px solid var(--launch-border);
         }
 
@@ -384,17 +486,19 @@ export default function LaunchPage() {
           font-weight: 700;
           letter-spacing: -0.025em;
           line-height: 1.1;
-          margin: 0 0 10px;
+          margin: 0 0 12px;
+          max-width: 520px;
         }
 
         .section-sub {
-          font-size: 16px;
+          font-size: 15px;
           color: var(--launch-muted);
           max-width: 440px;
-          line-height: 1.65;
-          margin: 0 0 48px;
+          line-height: 1.7;
+          margin: 0 0 44px;
         }
 
+        /* ── FEATURES GRID ── */
         .features {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -402,7 +506,7 @@ export default function LaunchPage() {
         }
 
         .feature {
-          padding: 28px 24px;
+          padding: 24px 20px;
           border-right: 1px solid var(--launch-border);
         }
 
@@ -414,12 +518,12 @@ export default function LaunchPage() {
           font-family: var(--app-mono);
           font-size: 11px;
           color: var(--launch-accent);
-          opacity: 0.6;
-          margin-bottom: 16px;
+          margin-bottom: 14px;
+          letter-spacing: 0.02em;
         }
 
         .feature h3 {
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 600;
           letter-spacing: -0.01em;
           margin: 0 0 8px;
@@ -432,11 +536,12 @@ export default function LaunchPage() {
           margin: 0;
         }
 
+        /* ── PHASES ── */
         .phase {
           display: grid;
-          grid-template-columns: 52px 1fr;
-          gap: 20px;
-          padding: 28px 0;
+          grid-template-columns: 48px 1fr;
+          gap: 16px;
+          padding: 16px 0;
           border-top: 1px solid var(--launch-border);
           align-items: start;
         }
@@ -449,7 +554,7 @@ export default function LaunchPage() {
           font-family: var(--app-mono);
           font-size: 12px;
           color: var(--launch-border);
-          padding-top: 4px;
+          padding-top: 6px;
           font-feature-settings: "tnum";
         }
 
@@ -491,21 +596,21 @@ export default function LaunchPage() {
         }
 
         .phase h3 {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 600;
           letter-spacing: -0.015em;
-          margin: 0 0 6px;
+          margin: 0 0 4px;
         }
 
         .phase p {
-          font-size: 14px;
+          font-size: 13px;
           color: var(--launch-muted);
           line-height: 1.65;
           margin: 0;
         }
 
         .roadmap-note {
-          margin: 28px 0 0;
+          margin: 24px 0 0;
           font-family: var(--app-mono);
           font-size: 12px;
           color: var(--launch-muted);
@@ -515,8 +620,9 @@ export default function LaunchPage() {
           color: var(--launch-accent);
         }
 
+        /* ── FOOTER ── */
         .footer {
-          padding: 36px 0;
+          padding: 32px 0;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -546,9 +652,18 @@ export default function LaunchPage() {
           text-decoration: none;
         }
 
+        /* ── RESPONSIVE ── */
         @media (max-width: 640px) {
           .nav-links {
             gap: 18px;
+          }
+
+          .term-demo {
+            margin-top: 36px;
+          }
+
+          .term-line {
+            font-size: 12px;
           }
 
           .features {
