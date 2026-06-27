@@ -1,0 +1,71 @@
+---
+description: Contexto de caribellm-platform — Next.js Frontend
+alwaysApply: true
+---
+
+# caribellm-platform — Next.js Frontend
+
+> Contexto global del proyecto: ver `../.cursor/rules/caribellm-shared.mdc`
+
+---
+
+## Rol de este repo
+UI pública (landing) y dashboard autenticado. Consume `caribellm-services` para auth/billing
+y muestra al usuario su balance de créditos, historial y API keys.
+
+## Stack
+- Next.js 16, TypeScript, React 19
+- axios + ServicesProvider para API calls
+- react-hook-form, react-toastify, react-icons
+- i18n: `src/messages/es.json` (principal) + `en.json`
+
+## Rutas
+
+| Ruta | Acceso | Estado |
+|---|---|---|
+| `/` | Público | ✅ Landing CaribeLLM |
+| `/sign-in` | Público | ✅ Template |
+| `/sign-up` | Público | ✅ Template |
+| `/auth/google/callback` | Público | ✅ Template |
+| `/dashboard` | Auth | ✅ Shell base |
+| `/dashboard/credits` | Auth | 🔲 Por construir |
+| `/dashboard/api-keys` | Auth | 🔲 Por construir |
+| `/dashboard/usage` | Auth | 🔲 Por construir |
+| `/node` | Público | 🔲 Fase 2 — nodo browser WebLLM |
+
+## Variables de entorno
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1      # caribellm-services
+NEXT_PUBLIC_GATEWAY_URL=http://localhost:8080          # caribellm-gateway
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+## Estructura clave
+
+```
+src/
+├── app/                  # Next.js App Router
+├── components/
+│   ├── auth/             # AuthGuard, SignInForm, SignUpForm, GoogleAuthButton
+│   ├── landing/          # LandingPage + sections (Hero, Problem, Solution, FAQ…)
+│   ├── layout/           # HomeShell (dashboard shell)
+│   └── ui/               # Button, Loader
+├── content/
+│   └── landing.ts        # ← Copy de la landing en español (ya configurado)
+├── data/
+│   ├── api/server/       # Clientes axios para services
+│   └── providers/        # ServicesProvider (estado global auth)
+├── messages/
+│   ├── es.json           # Español (principal)
+│   └── en.json           # Inglés
+└── config/env.ts         # Vars de entorno tipadas
+```
+
+## Convenciones
+- Auth guard: envolver rutas protegidas con `<AuthGuard>`
+- API calls: usar `ServicesProvider` + hooks, no fetch directo
+- Copy de la landing: editar solo en `src/content/landing.ts`
+- Estilos: CSS variables `--app-*` en `globals.css`
+- Nunca llamar a `/api/v1/internal/*` desde el frontend
+- Ver `docs/COMPONENTS.md` para patrones de componentes

@@ -1,0 +1,298 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --app-bg: #f4f4f5;
+  --app-surface: #ffffff;
+  --app-surface-muted: #fafafa;
+  --app-border: #e4e4e7;
+  --app-border-strong: #d4d4d8;
+  --app-text: #18181b;
+  --app-text-muted: #71717a;
+  --app-text-faint: #a1a1aa;
+  --app-primary: #2563eb;
+  --app-primary-hover: #1d4ed8;
+  --app-primary-soft: #eff6ff;
+  --app-danger: #dc2626;
+  --app-danger-bg: #fef2f2;
+  --app-danger-border: #fecaca;
+  --app-success: #16a34a;
+  --app-success-bg: #f0fdf4;
+  --app-radius: 8px;
+  --app-radius-lg: 12px;
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --app-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  /* Typography — see src/config/fonts.ts, docs/FONTS.md
+     Use a literal family name when forking (not var(--font-*) — that variable lives on <body>). */
+  --app-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --app-title-font: "Lora", Georgia, "Times New Roman", serif;
+  --app-mono: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: var(--app-font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--app-primary-soft);
+  color: var(--app-primary-hover);
+}
+
+a {
+  color: var(--app-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* —— Auth (sign-in / sign-up) —— */
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 1.5rem;
+  background: var(--app-bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-md);
+}
+
+.auth-form {
+  width: 100%;
+}
+
+.auth-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--app-text);
+}
+
+.auth-lede {
+  margin: 0 0 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--app-text-muted);
+}
+
+.auth-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--app-text);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.auth-input::placeholder {
+  color: var(--app-text-faint);
+}
+
+.auth-input:focus {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.auth-error {
+  margin: 0.25rem 0 0;
+  color: var(--app-danger);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.auth-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--app-text-muted);
+}
+
+.auth-hint--ok {
+  color: var(--app-success);
+}
+
+.auth-hint--warn {
+  color: var(--app-danger);
+}
+
+.auth-hint--muted {
+  color: var(--app-text-faint);
+}
+
+.auth-root-error {
+  margin-top: 0.25rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--app-danger);
+  background: var(--app-danger-bg);
+  border: 1px solid var(--app-danger-border);
+  border-radius: var(--app-radius);
+}
+
+.auth-password-wrap {
+  position: relative;
+}
+
+.auth-password-wrap .auth-input {
+  padding-right: 2.5rem;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.auth-password-toggle:hover {
+  color: var(--app-text);
+  background: var(--app-bg);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0 1rem;
+  font-size: 0.8125rem;
+  color: var(--app-text-faint);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--app-border);
+}
+
+.auth-footer {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  text-align: center;
+}
+
+.auth-footer:hover {
+  color: var(--app-primary);
+  text-decoration: underline;
+}
+
+/* —— Home (authenticated shell) —— */
+.home-shell {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.home-card {
+  padding: 1.75rem;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.home-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--app-text);
+}
+
+.home-lede {
+  margin: 0 0 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--app-text-muted);
+}
+
+.home-meta {
+  margin: 0 0 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.home-meta div {
+  padding: 0.75rem 1rem;
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+}
+
+.home-meta dt {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--app-text-faint);
+}
+
+.home-meta dd {
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--app-text);
+}
+
+.page-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--app-text-muted);
+  background: var(--app-bg);
+}

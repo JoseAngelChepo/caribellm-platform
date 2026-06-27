@@ -1,0 +1,120 @@
+---
+description: Template fork requirements and agent guidelines (branding, i18n, landing, components)
+alwaysApply: true
+---
+
+# Template — requirements & agent guidelines
+
+**This repo is a starter template, not a finished product.** Before launch, the user must replace placeholder copy, branding, env vars, API URLs, metadata, and assets. Do not treat placeholder names (`YourApp`, `App`, template metrics) as production values.
+
+See also: `template-context.mdc` (structure), `docs/COMPONENTS.md`, `docs/LANDING.md`, `docs/FONTS.md`.
+
+---
+
+## Before launch — user checklist
+
+| Area | What to change |
+|------|----------------|
+| Brand & SEO | `src/app/layout.tsx` (`metadata.title`, `description`), `package.json` `name` |
+| Favicon & icons | See **Favicon** below |
+| Copy | `src/content/landing.ts`, auth forms, `src/messages/*.json` |
+| Theme | `--app-*` tokens in `src/app/globals.css`; **pick a font first** — `src/config/fonts.ts` + `layout.tsx` + `--app-font` (see `docs/FONTS.md`) |
+| Env | `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_API_URL`, deployment env on platform + **template-services** |
+| Routes | Remove or replace placeholder footer links (`#` privacy/terms) |
+
+---
+
+## Favicon (user must replace)
+
+Use the product favicon before shipping. Next.js App Router picks up files under **`src/app/`**:
+
+| File | Purpose |
+|------|---------|
+| **`src/app/favicon.ico`** | Browser tab icon (required baseline) |
+| `src/app/icon.png` | Optional PNG app icon |
+| `src/app/apple-icon.png` | Optional Apple touch icon |
+
+Alternatively, place assets in **`public/`** (e.g. `public/favicon.ico`) and declare them in **`src/app/layout.tsx`** via `metadata.icons`.
+
+Remove or replace legacy template assets in `public/` (e.g. `chain_16.png`, `chain_64.png`) when rebranding.
+
+---
+
+## i18n — two languages by default
+
+- **Default locales**: `en` and `es`.
+- **Message bundles**: `src/messages/en.json`, `src/messages/es.json` — keep keys in sync across files.
+- **Client hook**: `src/i18n/client.ts` (`useMessages`, `readLocaleFromCookie`).
+- **Locale routing**: `src/proxy.ts` strips `/en` and `/es` prefixes and sets the `NEXT_LOCALE` cookie.
+
+**Adding a third language (e.g. `fr`):**
+
+1. Add `src/messages/fr.json` with the same key structure as `en.json`.
+2. Extend `Locale` type and bundles in `src/i18n/client.ts`.
+3. Update `src/proxy.ts` matcher/prefix handling if URL prefixes are used.
+4. Wire new copy in components (auth forms, dashboard, landing if localized).
+
+Landing copy currently lives in **`src/content/landing.ts`** (English only). Move strings to message bundles when localizing the marketing page.
+
+---
+
+## Landing page — edit only these (unless adding sections)
+
+**Copy (primary):** `src/content/landing.ts` — brand, hero, problem, solution, FAQ, footer, CTAs.
+
+**Section components (structure/layout only):** `src/components/landing/sections/*.tsx` — change markup or layout, not hardcoded marketing strings (keep copy in `landing.ts`).
+
+**Composer:** `src/components/landing/LandingPage.tsx` — add/remove/reorder sections here.
+
+**Header auth links:** `src/components/landing/LandingHeader.tsx` — rarely needs copy changes (uses `landing.ts`).
+
+**Styles:** `--app-*` tokens in `src/app/globals.css`; landing uses styled-jsx per section + `LandingSection` / `LandingContainer` / `LandingButton` — see `docs/COMPONENT-STYLES.md`.
+
+**Do not** scatter landing copy across random components or pages. **Do not** edit `src/app/page.tsx` beyond importing `LandingPage`.
+
+Full map: `docs/LANDING.md`.
+
+---
+
+## Styling & high-touch UI (forms + toasts)
+
+When changing visual identity, follow `docs/FONTS.md`, `docs/COMPONENTS.md`, and `docs/COMPONENT-STYLES.md`:
+
+1. **Font** — `fonts.ts` + `appFont.variable` on `<body>` + **literal** `--app-font` in `globals.css` (never `var(--font-*)` on `:root`; see `docs/FONTS.md`).
+2. **`src/app/globals.css`** — `--app-*` tokens.
+3. **Forms** — `src/components/auth/SignInForm.tsx`, `SignUpForm.tsx`, `.auth-*` in globals.css, optional `GoogleAuthButton.tsx`.
+4. **Toasts** — `src/app/toastify-theme.css`, `src/app/providers.tsx`, `src/lib/toast.ts`.
+
+---
+
+## Component architecture (avoid spaghetti)
+
+Folder layout (`docs/COMPONENTS.md`):
+
+- **`ui/`** — generic, reusable (Button, Loader).
+- **`auth/`** — session and auth UI.
+- **`layout/`** — shells (e.g. dashboard `HomeShell`).
+- **`landing/`** — public marketing sections.
+- **`<feature>/`** — new product domains (3+ related components).
+
+### External / third-party UI (e.g. 21st.dev, animated blocks)
+
+**Never** paste large third-party snippets directly into pages, layouts, or feature shells.
+
+1. **Create an isolated wrapper** under `src/components/ui/` or `src/components/<feature>/` (e.g. `AnimatedHeroBackground.tsx`).
+2. **Colocate** wrapper-specific CSS/modules with that component.
+3. **Expose a small API** — props like `className`, `children`, `variant`; hide vendor markup and animation libs inside.
+4. **Import only the wrapper** from pages/sections so removal = delete one folder/file.
+5. **No cross-cutting edits** — do not spread animation classes or vendor utilities across auth, providers, or `globals.css` unless promoting a vetted token.
+
+Goal: **as easy to remove as it was to add** — no debt, no spaghetti.
+
+---
+
+## Agent behavior
+
+- On fork/rebrand, **choose and wire a font first** (`docs/FONTS.md`) before landing copy or color tweaks.
+- Prefer extending **`landing.ts`** and existing section components over one-off page bloat.
+- Minimize scope; match existing patterns (`ServicesProvider`, `AuthGuard`, `@/components/...` imports).
+- Do not reintroduce product-specific domains (arena, challenges, admin) unless the user explicitly asks.
+- When adding dependencies for UI effects, justify isolation in the wrapper component and avoid leaking into core auth/API layers.
