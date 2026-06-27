@@ -26,11 +26,11 @@ export const launchContent = {
   },
   hero: {
     prompt: "caribellm@archipielago:~$",
-    title: "Inferencia distribuida,",
+    title: "IA accesible,",
     titleAccent: "construida en ",
     titleAccentHighlight: "comunidad.",
     lede:
-      "Red P2P de LLMs para Venezuela y el Caribe. Contribuye cómputo desde tu navegador o laptop, accede a modelos vía API compatible con OpenAI. Stack 100% open source.",
+      "Acceso gratuito a modelos de IA para quienes construyen herramientas para Venezuela y el Caribe. Contribuye cómputo desde tu navegador o laptop, usa la API compatible con OpenAI — todo open source.",
     primaryCta: "Ver fases",
     secondaryCta: "Código abierto",
     tags: ["Go gateway", "WebLLM", "libp2p", "Apache 2.0"],
@@ -50,7 +50,7 @@ export const launchContent = {
     title: "Cómputo compartido,",
     titleAccent: "inferencia accesible.",
     lede:
-      "Cada dispositivo que se une aporta capacidad de inferencia. El gateway enruta requests, valida créditos y coordina el swarm.",
+      "Cada dispositivo que se une aporta capacidad de inferencia. El gateway enruta requests y coordina la red entre nodos.",
     pillars: [
       {
         code: "// nodes",
