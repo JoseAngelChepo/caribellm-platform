@@ -20,75 +20,75 @@ export const landingContent = {
       { label: "FAQ", href: "#faq" },
     ] satisfies LandingNavItem[],
     loginLabel: "Entrar",
-    signupLabel: "Comenzar",
+    signupLabel: "Empezar gratis",
     dashboardLabel: "Dashboard",
   },
   hero: {
-    eyebrow: "Acceso anticipado abierto",
-    title: "Inferencia distribuida, construida en comunidad.",
+    eyebrow: "Acceso abierto · gratis para builders",
+    title: "IA accesible, construida en comunidad.",
     lede:
-      "CaribeLLM conecta laptops y navegadores en una red P2P que comparte cómputo para inferencia de LLMs. API compatible con OpenAI, stack open source, créditos por contribuir.",
-    primaryCta: { label: "Comenzar por $5", href: "/sign-up" },
+      "CaribeLLM da acceso gratuito a modelos de IA vía una API compatible con OpenAI, sobre una red de cómputo comunitario. Hecha para quienes construyen herramientas para Venezuela y el Caribe.",
+    primaryCta: { label: "Obtén tu API key", href: "/sign-up" },
     secondaryCta: { label: "Cómo funciona", href: "#how-it-works" },
   },
   problem: {
     id: "problem",
     eyebrow: "El problema",
-    title: "La inferencia de calidad sigue siendo centralizada y cara",
+    title: "Tu herramienta necesita un LLM. Pagarlo no debería frenarte.",
     lede:
-      "Los mejores modelos viven detrás de APIs costosas en USD, con un solo punto de fallo y sin forma de que la comunidad aporte cómputo a cambio de acceso.",
+      "Construir un bot de WhatsApp, un sistema de triage o una página que combate rumores casi siempre significa llamar a un modelo por debajo. Y ahí aparece la fricción.",
     items: [
       {
-        title: "Costo por token",
+        title: "Pago en USD, contra reloj",
         description:
-          "GPT-4o y Claude cobran tarifas pensadas para empresas en el norte global. Difícil de escalar para equipos pequeños en Venezuela y el Caribe.",
+          "Las APIs de calidad cobran en dólares con tarjeta internacional. Cuando construyes gratis y urgente, sacar tu tarjeta personal para pagar tokens no es opción.",
       },
       {
         title: "Un solo proveedor",
         description:
-          "Tu app depende de la disponibilidad de OpenAI o Anthropic. Si el servicio cae o cambia precios, no tienes alternativa inmediata.",
+          "Tu herramienta depende de que OpenAI o Anthropic estén disponibles y accesibles desde tu región. Si eso falla, no hay plan B inmediato.",
       },
       {
         title: "Cómputo ocioso",
         description:
-          "Millones de GPUs y CPUs en laptops y PCs están idle la mayor parte del día. Ese cómputo no se aprovecha para inferencia comunitaria.",
+          "Miles de laptops en la comunidad están idle la mayor parte del día. Ese cómputo puede sostener inferencia para los proyectos que más lo necesitan.",
       },
     ] satisfies LandingBullet[],
   },
   solution: {
     id: "solution",
     eyebrow: "La solución",
-    title: "Una red P2P donde cada nodo suma capacidad",
+    title: "Una API gratuita, sostenida por una red P2P",
     lede:
-      "CaribeLLM/archipielago distribuye requests entre un gateway Go, nodos browser (WebLLM) y clientes nativos (Rust + libp2p). Más nodos activos, más throughput para todos.",
+      "CaribeLLM distribuye requests entre un gateway Go, nodos browser (WebLLM) y clientes nativos (Rust + libp2p). Apuntas tu app a la API y funciona; sumas tu laptop a la red y aportas capacidad.",
     highlights: [
-      "API compatible con OpenAI — apunta tu app a api.caribellm.com sin cambiar código",
-      "Nodos browser sin instalación: WebLLM corre en tu pestaña y acumula créditos",
-      "Mixture-of-Agents: el swarm coordinator enruta cada request al nodo más apto",
+      "API compatible con OpenAI — apunta tu app a api.caribellm.com sin cambiar una línea de código",
+      "Nodos browser sin instalación: WebLLM corre en una pestaña y procesa requests de la red",
+      "El coordinador enruta cada request al nodo más apto para responderlo",
     ],
   },
   howItWorks: {
     id: "how-it-works",
     eyebrow: "Cómo funciona",
-    title: "De cuenta a nodo en tres pasos",
+    title: "De cuenta a la red en tres pasos",
     steps: [
       {
         step: "01",
         title: "Crea tu cuenta",
         description:
-          "Regístrate y deposita $5 — recibes $10 en créditos. El pool inicial financia inferencia mientras la red colaborativa crece.",
+          "Regístrate gratis y obtén tu API key. Sin tarjeta, sin pago — pensado para que empieces a construir hoy mismo.",
       },
       {
         step: "02",
         title: "Llama la API",
         description:
-          "Usa GPT-4o, Claude y modelos open-source vía POST /v1/chat/completions. Mismo formato que OpenAI, misma librería cliente.",
+          "Usa modelos de calidad vía POST /v1/chat/completions. Mismo formato que OpenAI, misma librería cliente — solo cambias la URL base.",
       },
       {
         step: "03",
-        title: "Corre un nodo",
+        title: "Suma tu nodo",
         description:
-          "Abre el nodo browser o instala el cliente nativo. Tu GPU/CPU procesa requests de otros usuarios y ganas créditos automáticamente.",
+          "Abre el nodo browser y tu laptop empieza a procesar requests de la red. Cada nodo que se une es más capacidad para todos los proyectos de la comunidad.",
       },
     ] satisfies LandingStep[],
   },
@@ -100,32 +100,32 @@ export const landingContent = {
       {
         title: "Gateway en Go",
         description:
-          "Proxy ultrarrápido a OpenAI/Anthropic con validación de créditos, rate limiting en Redis y deducción async post-request.",
+          "Proxy ultrarrápido a los modelos con rate limiting en Redis y enrutamiento async. Pensado para latencia baja desde la región.",
       },
       {
         title: "Red P2P con libp2p",
         description:
-          "DHT + GossipSub + WebRTC para descubrimiento y comunicación entre nodos. Mismo enfoque que Hyperspace e IPFS.",
+          "DHT + GossipSub + WebRTC para descubrimiento y comunicación entre nodos. El mismo enfoque que usan IPFS y otras redes distribuidas.",
       },
       {
         title: "Nodos browser con WebLLM",
         description:
-          "Inferencia local en el navegador con modelos cuantizados. Cero instalación — abre una pestaña y contribuyes.",
+          "Inferencia local en el navegador con modelos cuantizados. Cero instalación — abres una pestaña y contribuyes.",
       },
       {
-        title: "Créditos transparentes",
+        title: "Todo auditable",
         description:
-          "Wallets en PostgreSQL, transacciones ACID. Contribuyes cómputo, recibes créditos. Todo auditable en el dashboard.",
+          "Stack abierto bajo Apache 2.0: gateway, API, frontend y nodos. Sin lock-in, sin caja negra — puedes revisar y extender cada pieza.",
       },
     ] satisfies LandingBullet[],
   },
   socialProof: {
     eyebrow: "Fase 1 en marcha",
-    title: "Router centralizado hoy, red colaborativa mañana",
+    title: "Router centralizado hoy, red colaborativa en camino",
     stats: [
-      { value: "$5", label: "Para comenzar — recibes $10 en créditos" },
-      { value: "2×", label: "Multiplicador de créditos en acceso anticipado" },
-      { value: "0", label: "Instalación para el nodo browser" },
+      { value: "Gratis", label: "Para builders de la comunidad" },
+      { value: "1 línea", label: "Cambias la URL base y tu SDK funciona" },
+      { value: "0", label: "Instalación para sumar el nodo browser" },
     ],
     quote: {
       text: "Cada laptop que se une es un servidor más para la región.",
@@ -138,32 +138,32 @@ export const landingContent = {
     title: "Preguntas frecuentes",
     items: [
       {
-        question: "¿Por qué $5 para comenzar?",
+        question: "¿Es gratis?",
         answer:
-          "El depósito inicial cubre los costos reales de inferencia en Fase 1 (proxy a OpenAI/Anthropic) y filtra abuso del pool comunitario. Recibes el doble en créditos.",
+          "Sí. El acceso a la API es gratuito para quienes construyen herramientas para la comunidad. Más adelante habrá dinámicas para sostener el cómputo, pero el foco hoy es que puedas construir sin fricción.",
       },
       {
         question: "¿Qué modelos puedo usar?",
         answer:
-          "Fase 1: GPT-4o, GPT-4o-mini, Claude Sonnet, Claude Haiku vía el gateway. Fase 2: modelos open-source (Llama, Mistral, etc.) corriendo en nodos de la red.",
+          "Fase 1: modelos de calidad accesibles vía el gateway compatible con OpenAI. Fase 2: modelos open-source (Llama, Mistral, etc.) corriendo directamente en los nodos de la red.",
       },
       {
-        question: "¿Cómo contribuyo cómputo?",
+        question: "¿Cómo sumo mi laptop a la red?",
         answer:
-          "Abre /node en tu navegador — WebLLM carga un modelo cuantizado y procesa requests de la red. Para mayor rendimiento, instala el cliente nativo (Rust + Tauri).",
+          "Abre /node en tu navegador — WebLLM carga un modelo cuantizado y tu equipo empieza a procesar requests de la red. Para mayor rendimiento, instala el cliente nativo (Rust + Tauri).",
       },
       {
         question: "¿Es seguro correr un nodo?",
         answer:
-          "Los nodos solo procesan tokens de texto en sandbox. No acceden a tus archivos ni ven datos de otros usuarios. Tráfico encriptado end-to-end.",
+          "Los nodos solo procesan tokens de texto en sandbox. No acceden a tus archivos ni ven datos de otros usuarios, y el tráfico va encriptado end-to-end.",
       },
     ] satisfies LandingFaqItem[],
   },
   finalCta: {
-    title: "Únete como early adopter",
+    title: "Construye con la red, no contra el costo",
     lede:
-      "Los primeros usuarios reciben créditos adicionales conforme la red P2P crece. Corre un nodo, usa la API, o ambos.",
-    primaryCta: { label: "Comenzar por $5", href: "/sign-up" },
+      "Si estás haciendo algo para Venezuela y el Caribe, la API es tuya. Úsala en tu proyecto, suma tu laptop a la red, o ambas.",
+    primaryCta: { label: "Obtén tu API key", href: "/sign-up" },
     secondaryCta: { label: "Entrar", href: "/sign-in" },
   },
   footer: {
