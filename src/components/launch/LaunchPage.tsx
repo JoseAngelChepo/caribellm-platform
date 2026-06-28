@@ -1,11 +1,12 @@
 "use client"
 
 import Link from "next/link"
+import AppHeader from "@/components/layout/AppHeader"
+import { layoutContent } from "@/config/layout"
 import { launchContent } from "@/content/launch"
-import { useServices } from "@/data/providers/ServicesProvider"
 import type { LaunchPhaseStatus } from "@/content/launch"
 
-const { brand, header, hero, mission, phases, footer } = launchContent
+const { hero, mission, phases, footer } = launchContent
 
 const statusLabels: Record<LaunchPhaseStatus, string> = {
   launching: "En lanzamiento",
@@ -23,54 +24,23 @@ function GitHubIcon() {
 
 export default function LaunchPage() {
   const year = new Date().getFullYear()
-  const { isLoggedIn, stateService } = useServices()
 
   return (
     <div className="page">
-      <nav className="nav" aria-label="Principal">
-        <div className="nav-inner">
-          <a href="#inicio" className="nav-logo" aria-label="CaribeLLM archipielago — inicio">
-            {brand.prefix}
-            <span className="a">{brand.accent}</span>
-            <span className="s">/</span>
-            {brand.sub}
-          </a>
-          <ul className="nav-links">
-            <li>
-              <a href={`#${mission.id}`}>objetivo</a>
-            </li>
-            <li>
-              <a href={`#${phases.id}`}>fases</a>
-            </li>
-            <li>
-              <a
-                href={footer.github}
-                className="gh"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub&nbsp;↗
-              </a>
-            </li>
-          </ul>
-          <div className="nav-actions">
-            {stateService && isLoggedIn ? (
-              <Link href="/dashboard" className="btn-nav-primary">
-                {header.dashboardLabel}
-              </Link>
-            ) : (
-              <>
-                <Link href="/sign-in" className="nav-signin">
-                  {header.loginLabel}
-                </Link>
-                <Link href="/sign-up" className="btn-nav-primary">
-                  {header.signupLabel}
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <AppHeader
+        variant="public"
+        logoHref="#inicio"
+        navLinks={[
+          { label: "objetivo", href: `#${mission.id}` },
+          { label: "fases", href: `#${phases.id}` },
+          {
+            label: "GitHub ↗",
+            href: footer.github,
+            external: true,
+            className: "gh app-header-nav-link",
+          },
+        ]}
+      />
 
       <div className="wrap">
         {/* ── HERO ── */}
@@ -225,115 +195,11 @@ export default function LaunchPage() {
           line-height: 1.6;
         }
 
-        /* ── NAV ── */
-        .nav {
-          position: fixed;
-          inset: 0 0 auto 0;
-          z-index: 100;
-          background: var(--launch-bg);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--launch-border);
-        }
-
-        .nav-inner {
-          max-width: 760px;
-          margin: 0 auto;
-          padding: 0 24px;
-          height: 52px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-        }
-
-        .nav-logo {
-          font-family: var(--app-mono);
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--launch-text);
-          text-decoration: none;
-          letter-spacing: -0.01em;
-        }
-
-        .nav-logo :global(.a) {
-          color: var(--launch-accent);
-        }
-
-        /* "/" rendered as intentional typographic mark */
-        .nav-logo :global(.s) {
-          color: var(--launch-dim);
-          font-weight: 400;
-          margin: 0 1px;
-        }
-
-        .nav-links {
-          display: flex;
-          gap: 28px;
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-
-        .nav-links a {
-          color: var(--launch-muted);
-          text-decoration: none;
-          font-size: 13px;
-          transition: color 0.15s;
-        }
-
-        .nav-links a:hover {
-          color: var(--launch-text);
-          text-decoration: none;
-        }
-
-        .nav-links :global(.gh) {
-          color: var(--launch-text);
-          font-weight: 500;
-        }
-
-        .nav-actions {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-shrink: 0;
-        }
-
-        .nav-actions :global(.nav-signin) {
-          color: var(--launch-muted);
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 500;
-          padding: 6px 10px;
-          transition: color 0.15s;
-        }
-
-        .nav-actions :global(.nav-signin:hover) {
-          color: var(--launch-text);
-          text-decoration: none;
-        }
-
-        .nav-actions :global(.btn-nav-primary) {
-          background: var(--launch-accent);
-          color: #080b0b;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 700;
-          padding: 7px 14px;
-          transition: background 0.15s;
-        }
-
-        .nav-actions :global(.btn-nav-primary:hover) {
-          background: var(--launch-dim);
-          color: #fff;
-          text-decoration: none;
-        }
-
         /* ── LAYOUT ── */
         .wrap {
-          max-width: 760px;
+          max-width: ${layoutContent.publicMaxWidth}px;
           margin: 0 auto;
-          padding: 0 24px;
+          padding: 0 ${layoutContent.paddingX}px;
         }
 
         /* ── HERO ── */
@@ -711,14 +577,6 @@ export default function LaunchPage() {
 
         /* ── RESPONSIVE ── */
         @media (max-width: 640px) {
-          .nav-links {
-            display: none;
-          }
-
-          .nav-actions :global(.nav-signin) {
-            display: none;
-          }
-
           .term-demo {
             margin-top: 36px;
           }

@@ -60,6 +60,35 @@ export type ApiKeyListItem = {
 
 export type CreateApiKeyResponse = ApiKeyListItem & { key: string }
 
+export type UsageSummaryResponse = {
+  creditsAvailable: number
+  creditsUsed: number
+  creditsReceived: number
+  providerCostUsd: number
+  inferenceCount: number
+  totalInputTokens: number
+  totalOutputTokens: number
+  lastModel: string | null
+  lastActivityAt: string | null
+  creditsUsedPct: number
+  dailyUsage: Array<{
+    key: string
+    label: string
+    credits: number
+    requests: number
+    pct: number
+  }>
+  modelUsage: Array<{
+    model: string
+    credits: number
+    requests: number
+    inputTokens: number
+    outputTokens: number
+    pct: number
+  }>
+  creditSources: Array<{ id: string; label: string; value: number }>
+}
+
 export type ServicesApi = {
   signUp: (data: SignUpPayload) => Promise<AuthSessionPayload>
   login: (data: LoginPayload) => Promise<AuthSessionPayload>
@@ -67,6 +96,7 @@ export type ServicesApi = {
   logout: () => Promise<unknown>
   checkUsernameAvailability: (username: string) => Promise<UsernameAvailabilityResponse>
   getWallet: () => Promise<WalletResponse>
+  getUsageSummary: () => Promise<UsageSummaryResponse>
   getTransactions: (limit?: number) => Promise<TransactionResponse[]>
   listApiKeys: () => Promise<ApiKeyListItem[]>
   createApiKey: (name?: string) => Promise<CreateApiKeyResponse>
@@ -99,6 +129,8 @@ function createServices(api: AxiosInstance): ServicesApi {
       return api.post("/auth/logout", { refresh_token: refreshToken })
     },
     getWallet: () => api.get("/credits/wallet").then((r) => r.data as WalletResponse),
+    getUsageSummary: () =>
+      api.get("/credits/usage/summary").then((r) => r.data as UsageSummaryResponse),
     getTransactions: (limit = 20) =>
       api
         .get<TransactionResponse[]>("/credits/transactions", { params: { limit } })

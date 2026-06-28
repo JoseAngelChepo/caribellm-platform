@@ -1,4 +1,9 @@
-import type { ApiKeyListItem, TransactionResponse, WalletResponse } from "@/data/api/server"
+import type {
+  ApiKeyListItem,
+  TransactionResponse,
+  UsageSummaryResponse,
+  WalletResponse,
+} from "@/data/api/server"
 
 export type DashboardStats = {
   creditsAvailable: number
@@ -12,6 +17,7 @@ export type DashboardStats = {
   lastModel: string | null
   lastActivityAt: string | null
   walletCreatedAt: string | null
+  providerCostUsd?: number
 }
 
 export type UsageSegment = {
@@ -148,7 +154,7 @@ export function computeUsageOverview(
     { id: "bonus", label: "Bono", value: bonusCredits, tone: "success" },
     { id: "topup", label: "Recargas", value: topupCredits, tone: "muted" },
     { id: "used", label: "Consumidos", value: stats.creditsUsed, tone: "danger" },
-  ].filter((s) => s.value > 0)
+  ].filter((s) => s.value > 0) as UsageSegment[]
 
   const tokenSplit: UsageSegment[] = [
     {
@@ -206,6 +212,74 @@ export function computeUsageOverview(
     modelUsage,
     dailyUsage,
     creditsUsedPct: pctOf(stats.creditsUsed, creditTotal || 1),
+  }
+}
+
+/** Maps server-side usage summary (full history) into dashboard view models. */
+export function mapUsageSummary(
+  summary: UsageSummaryResponse,
+  wallet: WalletResponse,
+  apiKeys: ApiKeyListItem[],
+): { stats: DashboardStats; usage: UsageOverview } {
+  const toneBySource: Record<string, UsageSegment["tone"]> = {
+    bonus: "success",
+    topup: "muted",
+  };
+
+  return {
+    stats: {
+      creditsAvailable: summary.creditsAvailable,
+      lifetimePaidUsd: wallet.lifetimePaid,
+      creditsUsed: summary.creditsUsed,
+      creditsReceived: summary.creditsReceived,
+      inferenceCount: summary.inferenceCount,
+      activeApiKeys: apiKeys.length,
+      totalInputTokens: summary.totalInputTokens,
+      totalOutputTokens: summary.totalOutputTokens,
+      lastModel: summary.lastModel,
+      lastActivityAt: summary.lastActivityAt,
+      walletCreatedAt: wallet.createdAt,
+      providerCostUsd: summary.providerCostUsd,
+    },
+    usage: {
+      creditPool: [
+        {
+          id: "available",
+          label: "Disponibles",
+          value: summary.creditsAvailable,
+          tone: "accent",
+        },
+        {
+          id: "used",
+          label: "Consumidos",
+          value: summary.creditsUsed,
+          tone: "danger",
+        },
+      ],
+      creditSources: summary.creditSources.map((s) => ({
+        id: s.id,
+        label: s.label,
+        value: s.value,
+        tone: toneBySource[s.id] ?? "muted",
+      })),
+      tokenSplit: [
+        {
+          id: "input",
+          label: "Entrada",
+          value: summary.totalInputTokens,
+          tone: "accent",
+        },
+        {
+          id: "output",
+          label: "Salida",
+          value: summary.totalOutputTokens,
+          tone: "muted",
+        },
+      ],
+      modelUsage: summary.modelUsage,
+      dailyUsage: summary.dailyUsage,
+      creditsUsedPct: summary.creditsUsedPct,
+    },
   }
 }
 

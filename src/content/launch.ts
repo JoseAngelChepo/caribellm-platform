@@ -1,3 +1,5 @@
+import { brandContent } from "@/content/brand"
+
 export type LaunchPhaseStatus = "launching" | "building" | "planned"
 
 export type LaunchPillar = {
@@ -19,16 +21,7 @@ export type LaunchTerminalLine = {
 }
 
 export const launchContent = {
-  brand: {
-    prefix: "caribe",
-    accent: "LLM",
-    sub: "archipielago",
-  },
-  header: {
-    loginLabel: "Entrar",
-    signupLabel: "Comenzar",
-    dashboardLabel: "Dashboard",
-  },
+  ...brandContent,
   hero: {
     prompt: "caribellm@archipielago:~$",
     title: "IA accesible,",

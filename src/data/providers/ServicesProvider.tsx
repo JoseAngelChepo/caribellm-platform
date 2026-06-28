@@ -16,6 +16,7 @@ import createServices, {
   type CreateApiKeyResponse,
   type TransactionResponse,
   type UsernameAvailabilityResponse,
+  type UsageSummaryResponse,
   type WalletResponse,
 } from "@/data/api/server"
 import { ApiServices } from "@/data/api/server/config"
@@ -49,6 +50,7 @@ type ServicesContextValue = {
     getUser: () => Promise<Record<string, unknown> | false | null>
     refreshUser: () => Promise<Record<string, unknown> | false | null>
     getWallet: () => Promise<WalletResponse>
+    getUsageSummary: () => Promise<UsageSummaryResponse>
     getTransactions: (limit?: number) => Promise<TransactionResponse[]>
     listApiKeys: () => Promise<ApiKeyListItem[]>
     createApiKey: (name?: string) => Promise<CreateApiKeyResponse>
@@ -207,6 +209,7 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
   }, [Services])
 
   const getWallet = useCallback(() => Services.getWallet(), [Services])
+  const getUsageSummary = useCallback(() => Services.getUsageSummary(), [Services])
   const getTransactions = useCallback(
     (limit?: number) => Services.getTransactions(limit),
     [Services],
@@ -254,6 +257,7 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
         getUser,
         refreshUser,
         getWallet,
+        getUsageSummary,
         getTransactions,
         listApiKeys,
         createApiKey,
@@ -273,6 +277,7 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
       getUser,
       refreshUser,
       getWallet,
+      getUsageSummary,
       getTransactions,
       listApiKeys,
       createApiKey,

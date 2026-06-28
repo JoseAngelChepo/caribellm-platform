@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Loader from "@/components/ui/Loader"
+import UsagePanel from "@/components/dashboard/UsagePanel"
 import type {
   ApiKeyListItem,
   CreateApiKeyResponse,
   TransactionResponse,
+  UsageSummaryResponse,
   WalletResponse,
 } from "@/data/api/server"
 import { useServices } from "@/data/providers/ServicesProvider"
@@ -14,17 +16,11 @@ import {
   accountTierLabel,
   computeDashboardStats,
   computeUsageOverview,
-  type UsageSegment,
+  mapUsageSummary,
 } from "@/lib/dashboardStats"
 import { toast } from "@/lib/toast"
+import { formatCredits } from "@/lib/formatCredits"
 import { userDisplayName } from "@/lib/userDisplayName"
-
-function formatCredits(value: number): string {
-  return new Intl.NumberFormat("es-VE", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value)
-}
 
 function formatUsd(value: number): string {
   return new Intl.NumberFormat("es-VE", {
@@ -42,15 +38,6 @@ function formatDate(iso: string): string {
   }).format(new Date(iso))
 }
 
-function formatTokens(value: number): string {
-  return new Intl.NumberFormat("es-VE").format(value)
-}
-
-function pctOf(value: number, total: number): number {
-  if (total <= 0) return 0
-  return Math.min(100, Math.round((value / total) * 1000) / 10)
-}
-
 function maskKey(item: ApiKeyListItem): string {
   return `${item.prefix}…${item.lastFourChars}`
 }
@@ -58,87 +45,6 @@ function maskKey(item: ApiKeyListItem): string {
 function readString(user: Record<string, unknown> | null, key: string): string | null {
   const value = user?.[key]
   return typeof value === "string" && value.length > 0 ? value : null
-}
-
-type StatCardProps = {
-  label: string
-  value: string
-  hint?: string
-  accent?: boolean
-}
-
-function StatCard({ label, value, hint, accent }: StatCardProps) {
-  return (
-    <div className={`dash-stat${accent ? " dash-stat--accent" : ""}`}>
-      <p className="dash-stat-label">{label}</p>
-      <p className="dash-stat-value">{value}</p>
-      {hint ? <p className="dash-stat-hint">{hint}</p> : null}
-    </div>
-  )
-}
-
-type UsageBarProps = {
-  label: string
-  value: string
-  pct: number
-  tone: UsageSegment["tone"]
-  hint?: string
-}
-
-function UsageBar({ label, value, pct, tone, hint }: UsageBarProps) {
-  const width = pct > 0 ? Math.max(pct, 6) : 0
-  return (
-    <div className="usage-bar">
-      <div className="usage-bar-head">
-        <span>{label}</span>
-        <span className="usage-bar-value">{value}</span>
-      </div>
-      <div className="usage-bar-track" aria-hidden="true">
-        <div className={`usage-bar-fill usage-bar-fill--${tone}`} style={{ width: `${width}%` }} />
-      </div>
-      {hint ? <p className="usage-bar-hint">{hint}</p> : null}
-    </div>
-  )
-}
-
-function StackedCreditBar({
-  segments,
-  total,
-}: {
-  segments: UsageSegment[]
-  total: number
-}) {
-  if (total <= 0) {
-    return <p className="dash-empty">Sin movimiento de créditos todavía.</p>
-  }
-
-  return (
-    <div className="stacked-bar">
-      <div className="stacked-bar-track" role="img" aria-label="Distribución de créditos">
-        {segments.map((segment) => {
-          const width = (segment.value / total) * 100
-          if (width <= 0) return null
-          return (
-            <div
-              key={segment.id}
-              className={`stacked-bar-seg stacked-bar-seg--${segment.tone}`}
-              style={{ width: `${width}%` }}
-              title={`${segment.label}: ${segment.value}`}
-            />
-          )
-        })}
-      </div>
-      <ul className="stacked-bar-legend">
-        {segments.map((segment) => (
-          <li key={segment.id}>
-            <span className={`stacked-dot stacked-dot--${segment.tone}`} aria-hidden="true" />
-            <span>{segment.label}</span>
-            <strong>{formatCredits(segment.value)}</strong>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
 }
 
 const DASHBOARD_TABS = [
@@ -154,6 +60,7 @@ export default function DashboardView() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [wallet, setWallet] = useState<WalletResponse | null>(null)
+  const [usageSummary, setUsageSummary] = useState<UsageSummaryResponse | null>(null)
   const [transactions, setTransactions] = useState<TransactionResponse[]>([])
   const [apiKeys, setApiKeys] = useState<ApiKeyListItem[]>([])
   const [newKeyName, setNewKeyName] = useState("")
@@ -172,10 +79,12 @@ export default function DashboardView() {
       try {
         const walletData = await services.getWallet()
         setWallet(walletData)
-        const [txs, keys] = await Promise.all([
+        const [summary, txs, keys] = await Promise.all([
+          services.getUsageSummary().catch(() => null),
           services.getTransactions(50).catch(() => [] as TransactionResponse[]),
           services.listApiKeys(),
         ])
+        setUsageSummary(summary)
         setTransactions(txs)
         setApiKeys(keys)
       } catch {
@@ -192,18 +101,22 @@ export default function DashboardView() {
     void loadDashboard()
   }, [loadDashboard])
 
-  const stats = useMemo(
-    () => computeDashboardStats(wallet, transactions, apiKeys),
-    [wallet, transactions, apiKeys],
-  )
+  const stats = useMemo(() => {
+    if (usageSummary && wallet) {
+      return mapUsageSummary(usageSummary, wallet, apiKeys).stats
+    }
+    return computeDashboardStats(wallet, transactions, apiKeys)
+  }, [usageSummary, wallet, transactions, apiKeys])
 
-  const usage = useMemo(
-    () => computeUsageOverview(stats, transactions),
-    [stats, transactions],
-  )
-
-  const creditPoolTotal = stats.creditsAvailable + stats.creditsUsed
-  const tokenTotal = stats.totalInputTokens + stats.totalOutputTokens
+  const usage = useMemo(() => {
+    if (usageSummary && wallet) {
+      return mapUsageSummary(usageSummary, wallet, apiKeys).usage
+    }
+    return computeUsageOverview(
+      computeDashboardStats(wallet, transactions, apiKeys),
+      transactions,
+    )
+  }, [usageSummary, wallet, transactions, apiKeys])
 
   const onCreateKey = async () => {
     setCreatingKey(true)
@@ -292,8 +205,8 @@ export default function DashboardView() {
   return (
     <div className="dash">
       <header className="dash-hero">
-        <div className="dash-hero-top">
-          <p className="dash-eyebrow">caribellm@archipielago:~$ dashboard</p>
+        <div className="dash-hero-head">
+          <h1 className="dash-title">Hola, {greeting}</h1>
           <button
             type="button"
             className="dash-btn-ghost"
@@ -303,13 +216,10 @@ export default function DashboardView() {
             {refreshing ? "Actualizando…" : "Actualizar"}
           </button>
         </div>
-        <h1 className="dash-title">Hola, {greeting}</h1>
-        <p className="dash-lede">Créditos, inferencia, claves API y tu cuenta — todo en un solo lugar.</p>
         <div className="dash-status-row">
-          <span className="dash-balance-chip">{formatCredits(stats.creditsAvailable)} créditos</span>
-          <span className={`dash-pill${readyForInference ? " dash-pill--ok" : ""}`}>
-            {readyForInference ? "Listo para inferir" : "Crea una clave API para empezar"}
-          </span>
+          {!readyForInference ? (
+            <span className="dash-pill">Crea una clave API para empezar</span>
+          ) : null}
           {stats.lastActivityAt ? (
             <span className="dash-meta">Última actividad · {formatDate(stats.lastActivityAt)}</span>
           ) : null}
@@ -341,152 +251,11 @@ export default function DashboardView() {
       </div>
 
       {activeTab === "usage" ? (
-        <div
-          className="dash-panel"
-          role="tabpanel"
-          id="dash-panel-usage"
-          aria-labelledby="dash-tab-usage"
-        >
-          <section className="dash-stats dash-stats--compact" aria-label="Uso actual">
-            <StatCard
-              label="Disponibles"
-              value={formatCredits(stats.creditsAvailable)}
-              hint={`${usage.creditsUsedPct}% consumido`}
-              accent
-            />
-            <StatCard
-              label="Consumidos"
-              value={formatCredits(stats.creditsUsed)}
-              hint={`${stats.inferenceCount} inferencias`}
-            />
-            <StatCard
-              label="Tokens"
-              value={formatTokens(tokenTotal)}
-              hint={
-                tokenTotal > 0
-                  ? `${formatTokens(stats.totalInputTokens)} entrada · ${formatTokens(stats.totalOutputTokens)} salida`
-                  : "Sin procesar aún"
-              }
-            />
-          </section>
-
-          <section className="dash-card dash-card--highlight" aria-labelledby="credits-usage-title">
-            <div className="dash-card-head">
-              <div>
-                <h2 className="dash-card-title" id="credits-usage-title">
-                  Uso de créditos
-                </h2>
-                <p className="dash-card-sub">
-                  {formatCredits(stats.creditsUsed)} consumidos · {formatCredits(stats.creditsAvailable)} restantes
-                </p>
-              </div>
-              <span className="dash-usage-pct">{usage.creditsUsedPct}%</span>
-            </div>
-            <StackedCreditBar segments={usage.creditPool} total={creditPoolTotal} />
-          </section>
-
-          <div className="dash-grid-2">
-            <section className="dash-card" aria-labelledby="sources-title">
-              <h2 className="dash-card-title" id="sources-title">
-                Origen y consumo
-              </h2>
-              {usage.creditSources.length === 0 ? (
-                <p className="dash-empty">Empiezas con 5 créditos de bono al registrarte.</p>
-              ) : (
-                <div className="usage-bar-group">
-                  {usage.creditSources.map((segment) => (
-                    <UsageBar
-                      key={segment.id}
-                      label={segment.label}
-                      value={formatCredits(segment.value)}
-                      pct={pctOf(segment.value, stats.creditsReceived + stats.creditsUsed || 1)}
-                      tone={segment.tone}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section className="dash-card" aria-labelledby="tokens-title">
-              <h2 className="dash-card-title" id="tokens-title">
-                Tokens
-              </h2>
-              {tokenTotal === 0 ? (
-                <p className="dash-empty">
-                  Sin tokens procesados.{" "}
-                  <button type="button" className="dash-link-btn" onClick={() => setActiveTab("api")}>
-                    Configura tu API
-                  </button>
-                </p>
-              ) : (
-                <div className="usage-bar-group">
-                  {usage.tokenSplit.map((segment) => (
-                    <UsageBar
-                      key={segment.id}
-                      label={segment.label}
-                      value={formatTokens(segment.value)}
-                      pct={pctOf(segment.value, tokenTotal)}
-                      tone={segment.tone}
-                      hint={
-                        segment.id === "input"
-                          ? `${pctOf(segment.value, tokenTotal)}% del total`
-                          : `${pctOf(segment.value, tokenTotal)}% del total`
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
-
-          <section className="dash-card" aria-labelledby="daily-title">
-            <div className="dash-card-head">
-              <div>
-                <h2 className="dash-card-title" id="daily-title">
-                  Actividad — últimos 7 días
-                </h2>
-                <p className="dash-card-sub">Créditos consumidos por día</p>
-              </div>
-            </div>
-            <div className="daily-chart" role="img" aria-label="Gráfico de uso semanal">
-              {usage.dailyUsage.map((day) => (
-                <div key={day.key} className="daily-chart-col">
-                  <div className="daily-chart-bar-wrap">
-                    <div
-                      className="daily-chart-bar"
-                      style={{ height: `${Math.max(day.pct, day.credits > 0 ? 8 : 0)}%` }}
-                      title={`${day.label}: ${formatCredits(day.credits)} · ${day.requests} req`}
-                    />
-                  </div>
-                  <span className="daily-chart-label">{day.label}</span>
-                  {day.requests > 0 ? (
-                    <span className="daily-chart-meta">{day.requests}</span>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {usage.modelUsage.length > 0 ? (
-            <section className="dash-card" aria-labelledby="models-title">
-              <h2 className="dash-card-title" id="models-title">
-                Uso por modelo
-              </h2>
-              <div className="usage-bar-group">
-                {usage.modelUsage.map((row) => (
-                  <UsageBar
-                    key={row.model}
-                    label={row.model}
-                    value={formatCredits(row.credits)}
-                    pct={row.pct}
-                    tone="accent"
-                    hint={`${row.requests} solic. · ${formatTokens(row.inputTokens)} entrada / ${formatTokens(row.outputTokens)} salida`}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </div>
+        <UsagePanel
+          stats={stats}
+          usage={usage}
+          onConfigureApi={() => setActiveTab("api")}
+        />
       ) : null}
 
       {activeTab === "api" ? (
@@ -675,10 +444,12 @@ export default function DashboardView() {
                 <dt>Claves API activas</dt>
                 <dd>{stats.activeApiKeys}</dd>
               </div>
-              <div className="dash-dl-row">
-                <dt>Estado</dt>
-                <dd>{readyForInference ? "Listo para inferir" : "Sin clave API"}</dd>
-              </div>
+              {!readyForInference ? (
+                <div className="dash-dl-row">
+                  <dt>Estado</dt>
+                  <dd>Sin clave API</dd>
+                </div>
+              ) : null}
             </dl>
             {!readyForInference ? (
               <button type="button" className="dash-btn-primary dash-btn-inline" onClick={() => setActiveTab("api")}>
@@ -700,23 +471,16 @@ export default function DashboardView() {
           margin-bottom: 28px;
         }
 
-        .dash-hero-top {
+        .dash-hero-head {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
           gap: 12px;
-          margin-bottom: 12px;
-        }
-
-        .dash-eyebrow {
-          font-family: var(--app-mono);
-          font-size: 12px;
-          color: var(--launch-accent);
-          margin: 0;
+          margin-bottom: 8px;
         }
 
         .dash-title {
-          margin: 0 0 8px;
+          margin: 0;
           font-family: var(--app-title-font);
           font-size: clamp(1.75rem, 4vw, 2.25rem);
           font-weight: 700;
@@ -724,29 +488,11 @@ export default function DashboardView() {
           line-height: 1.1;
         }
 
-        .dash-lede {
-          margin: 0 0 14px;
-          color: var(--launch-muted);
-          max-width: 560px;
-        }
-
         .dash-status-row {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           gap: 10px;
-        }
-
-        .dash-balance-chip {
-          display: inline-flex;
-          align-items: center;
-          padding: 4px 10px;
-          font-family: var(--app-title-font);
-          font-size: 13px;
-          font-weight: 700;
-          color: var(--launch-accent);
-          border: 1px solid rgba(0, 207, 189, 0.35);
-          background: rgba(0, 207, 189, 0.06);
         }
 
         .dash-pill {
@@ -852,229 +598,6 @@ export default function DashboardView() {
           }
         }
 
-        .dash-link-btn {
-          background: none;
-          border: none;
-          padding: 0;
-          font: inherit;
-          color: var(--launch-accent);
-          cursor: pointer;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-        }
-
-        .dash-link-btn:hover {
-          color: var(--launch-dim);
-        }
-
-        .dash-stats {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-          margin-bottom: 16px;
-        }
-
-        .dash-stats--compact .dash-stat {
-          min-height: 88px;
-        }
-
-        .dash-card--highlight {
-          border-color: rgba(0, 207, 189, 0.22);
-          background: linear-gradient(180deg, rgba(0, 207, 189, 0.04), var(--launch-surface));
-        }
-
-        .dash-card-sub {
-          margin: 4px 0 0;
-          font-size: 13px;
-          color: var(--launch-muted);
-        }
-
-        .dash-usage-pct {
-          font-family: var(--app-title-font);
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: var(--launch-accent);
-          line-height: 1;
-        }
-
-        .stacked-bar-track {
-          display: flex;
-          height: 14px;
-          overflow: hidden;
-          background: var(--launch-bg);
-          border: 1px solid var(--launch-border);
-        }
-
-        .stacked-bar-seg {
-          height: 100%;
-          min-width: 2px;
-          transition: width 0.35s ease;
-        }
-
-        .stacked-bar-seg--accent {
-          background: var(--launch-accent);
-        }
-
-        .stacked-bar-seg--danger {
-          background: var(--launch-danger);
-        }
-
-        .stacked-bar-seg--success {
-          background: var(--launch-success);
-        }
-
-        .stacked-bar-seg--muted {
-          background: #3d4a48;
-        }
-
-        .stacked-bar-legend {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 16px;
-          list-style: none;
-          margin: 14px 0 0;
-          padding: 0;
-        }
-
-        .stacked-bar-legend li {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          color: var(--launch-muted);
-        }
-
-        .stacked-bar-legend strong {
-          color: var(--launch-text);
-          font-weight: 600;
-        }
-
-        .stacked-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 1px;
-          flex-shrink: 0;
-        }
-
-        .stacked-dot--accent {
-          background: var(--launch-accent);
-        }
-
-        .stacked-dot--danger {
-          background: var(--launch-danger);
-        }
-
-        .stacked-dot--success {
-          background: var(--launch-success);
-        }
-
-        .stacked-dot--muted {
-          background: #3d4a48;
-        }
-
-        .usage-bar-group {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .usage-bar-head {
-          display: flex;
-          align-items: baseline;
-          justify-content: space-between;
-          gap: 12px;
-          margin-bottom: 8px;
-          font-size: 13px;
-        }
-
-        .usage-bar-value {
-          font-family: var(--app-mono);
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--launch-text);
-        }
-
-        .usage-bar-track {
-          height: 8px;
-          background: var(--launch-bg);
-          border: 1px solid var(--launch-border);
-          overflow: hidden;
-        }
-
-        .usage-bar-fill {
-          height: 100%;
-          transition: width 0.35s ease;
-        }
-
-        .usage-bar-fill--accent {
-          background: linear-gradient(90deg, var(--launch-dim), var(--launch-accent));
-        }
-
-        .usage-bar-fill--danger {
-          background: linear-gradient(90deg, #b91c1c, var(--launch-danger));
-        }
-
-        .usage-bar-fill--success {
-          background: linear-gradient(90deg, #15803d, var(--launch-success));
-        }
-
-        .usage-bar-fill--muted {
-          background: linear-gradient(90deg, #2a3432, #4a5a58);
-        }
-
-        .usage-bar-hint {
-          margin: 6px 0 0;
-          font-size: 11px;
-          color: var(--launch-muted);
-        }
-
-        .daily-chart {
-          display: grid;
-          grid-template-columns: repeat(7, minmax(0, 1fr));
-          gap: 8px;
-          align-items: end;
-          min-height: 160px;
-          padding-top: 8px;
-        }
-
-        .daily-chart-col {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-          min-width: 0;
-        }
-
-        .daily-chart-bar-wrap {
-          width: 100%;
-          height: 120px;
-          display: flex;
-          align-items: flex-end;
-          justify-content: center;
-        }
-
-        .daily-chart-bar {
-          width: 100%;
-          max-width: 36px;
-          min-height: 4px;
-          background: linear-gradient(180deg, var(--launch-accent), var(--launch-dim));
-          border: 1px solid rgba(0, 207, 189, 0.35);
-          transition: height 0.35s ease;
-        }
-
-        .daily-chart-label {
-          font-family: var(--app-mono);
-          font-size: 10px;
-          text-transform: uppercase;
-          color: var(--launch-muted);
-        }
-
-        .daily-chart-meta {
-          font-size: 10px;
-          color: var(--launch-accent);
-          font-weight: 600;
-        }
-
         .dash-dl--inline .dash-dl-row {
           display: grid;
           grid-template-columns: 140px 1fr;
@@ -1103,62 +626,11 @@ export default function DashboardView() {
           margin-top: 16px;
         }
 
-        .dash-stat {
-          background: var(--launch-surface);
-          border: 1px solid var(--launch-border);
-          padding: 16px;
-          min-height: 100px;
-        }
-
-        .dash-stat--accent {
-          border-color: rgba(0, 207, 189, 0.25);
-          background: linear-gradient(180deg, rgba(0, 207, 189, 0.05), var(--launch-surface));
-        }
-
-        .dash-stat-label {
-          margin: 0 0 8px;
-          font-family: var(--app-mono);
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--launch-muted);
-        }
-
-        .dash-stat-value {
-          margin: 0 0 6px;
-          font-family: var(--app-title-font);
-          font-size: clamp(1.35rem, 3vw, 1.75rem);
-          font-weight: 700;
-          line-height: 1;
-          color: var(--launch-text);
-        }
-
-        .dash-stat--accent .dash-stat-value {
-          color: var(--launch-accent);
-        }
-
-        .dash-stat-hint {
-          margin: 0;
-          font-size: 12px;
-          color: var(--launch-muted);
-        }
-
-        .dash-grid-2 {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 16px;
-          margin-bottom: 16px;
-        }
-
         .dash-card {
           background: var(--launch-surface);
           border: 1px solid var(--launch-border);
           padding: 24px;
           margin-bottom: 16px;
-        }
-
-        .dash-grid-2 .dash-card {
-          margin-bottom: 0;
         }
 
         .dash-card-label {
@@ -1424,28 +896,6 @@ export default function DashboardView() {
         }
 
         @media (max-width: 900px) {
-          .dash-stats {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .dash-grid-2 {
-            grid-template-columns: 1fr;
-          }
-
-          .dash-grid-2 .dash-card {
-            margin-bottom: 16px;
-          }
-
-          .dash-grid-2 .dash-card:last-child {
-            margin-bottom: 0;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .dash-stats {
-            grid-template-columns: 1fr;
-          }
-
           .dash-key-form {
             flex-direction: column;
           }
