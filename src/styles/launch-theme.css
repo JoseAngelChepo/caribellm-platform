@@ -1,27 +1,65 @@
 .launch-theme {
-  --launch-bg: #080b0b;
-  --launch-surface: #0f1414;
-  --launch-border: #1c2424;
-  --launch-text: #e8edec;
-  --launch-muted: #8aaba7;
-  --launch-accent: #00cfbd;
-  --launch-dim: #008f82;
-  --launch-green: #22c55e;
-  --launch-danger: #f87171;
-  --launch-success: #22c55e;
+  /* —— Base surfaces —— */
+  --launch-bg: #070b0c;
+  --launch-bg-elevated: #0c1213;
+  --launch-surface: #0e1516;
+  --launch-surface-2: #121b1c;
+  --launch-border: #1d2829;
+  --launch-border-strong: #29383a;
 
+  /* —— Text —— */
+  --launch-text: #eaf2f0;
+  --launch-muted: #8aa6a2;
+  --launch-faint: #5d7572;
+
+  /* —— Accents: teal (primary) + coral sunset (warm) —— */
+  --launch-accent: #14d6c2;
+  --launch-accent-soft: rgba(20, 214, 194, 0.12);
+  --launch-dim: #0a8c80;
+  --launch-warm: #ff9d6c;
+  --launch-warm-soft: rgba(255, 157, 108, 0.14);
+  --launch-gold: #ffd27a;
+  --launch-green: #34d399;
+  --launch-danger: #f87171;
+  --launch-success: #34d399;
+
+  /* Signature gradient — teal → coral (Caribbean sunset over water) */
+  --launch-gradient: linear-gradient(108deg, #14d6c2 0%, #43c9c2 38%, #ff9d6c 100%);
+  --launch-gradient-soft: linear-gradient(
+    108deg,
+    rgba(20, 214, 194, 0.16) 0%,
+    rgba(255, 157, 108, 0.16) 100%
+  );
+
+  /* —— Shape & depth —— */
+  --launch-radius: 16px;
+  --launch-radius-sm: 11px;
+  --launch-radius-pill: 999px;
+  --launch-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --launch-shadow-md: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
+  --launch-shadow-lg: 0 30px 70px -25px rgba(0, 0, 0, 0.7);
+  --launch-glow-teal: 0 0 0 1px rgba(20, 214, 194, 0.18), 0 18px 50px -16px rgba(20, 214, 194, 0.35);
+  --launch-glow-warm: 0 24px 60px -20px rgba(255, 157, 108, 0.3);
+
+  /* —— Typography scale —— */
   --launch-body-size: 16px;
   --launch-lede-size: 18px;
   --launch-prose-width: 40rem;
   --launch-prose-leading: 1.7;
-  --launch-section-y: 80px;
-  --launch-text-display: clamp(36px, 4.2vw, 56px);
-  --launch-text-h2: clamp(22px, 2.8vw, 28px);
+  --launch-section-y: 104px;
+  --launch-text-display: clamp(44px, 6vw, 76px);
+  --launch-text-h2: clamp(26px, 3.4vw, 38px);
 
-  background: var(--launch-bg);
   color: var(--launch-text);
+  background-color: var(--launch-bg);
+  /* Ambient atmosphere: deep-ocean glow up top, faint warm horizon */
+  background-image:
+    radial-gradient(120% 80% at 50% -8%, rgba(20, 214, 194, 0.1) 0%, transparent 55%),
+    radial-gradient(90% 60% at 92% 6%, rgba(255, 157, 108, 0.07) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 
 .launch-theme--dashboard {
-  --launch-muted: #4a5a58;
+  --launch-muted: #6f8a86;
+  background-image: none;
 }
