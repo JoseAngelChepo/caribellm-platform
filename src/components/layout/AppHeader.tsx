@@ -118,6 +118,17 @@ export default function AppHeader(props: AppHeaderProps) {
           color: var(--launch-text);
           text-decoration: none;
           letter-spacing: -0.01em;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .wordmark :global(.wordmark-mark) {
+          flex-shrink: 0;
+        }
+
+        .wordmark :global(.wordmark-text) {
+          line-height: 1;
         }
 
         .wordmark:hover {
