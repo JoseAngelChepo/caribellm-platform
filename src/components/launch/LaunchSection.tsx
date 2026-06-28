@@ -1,6 +1,7 @@
 type LaunchSectionProps = {
   id?: string
   ariaLabelledBy?: string
+  ariaLabel?: string
   className?: string
   children: React.ReactNode
 }
@@ -8,6 +9,7 @@ type LaunchSectionProps = {
 export default function LaunchSection({
   id,
   ariaLabelledBy,
+  ariaLabel,
   className = "",
   children,
 }: LaunchSectionProps) {
@@ -16,6 +18,7 @@ export default function LaunchSection({
       id={id}
       className={`launch-section ${className}`.trim()}
       {...(ariaLabelledBy ? { "aria-labelledby": ariaLabelledBy } : {})}
+      {...(ariaLabel ? { "aria-label": ariaLabel } : {})}
     >
       {children}
       <style jsx>{`

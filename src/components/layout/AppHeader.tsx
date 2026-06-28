@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import CaribeLLMWordmark from "@/components/ui/CaribeLLMWordmark"
 import { brandContent } from "@/content/brand"
 import { layoutContent } from "@/config/layout"
@@ -50,133 +51,184 @@ export default function AppHeader(props: AppHeaderProps) {
   const router = useRouter()
   const pathname = usePathname() ?? "/"
   const { user, isLoggedIn, role, stateService, services } = useServices()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const navLinks = props.variant === "public" ? props.navLinks : undefined
   const showAdminLink = stateService && isLoggedIn && isAdminRole(role)
   const onAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/")
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false)
+    }
+
+    document.addEventListener("keydown", onKeyDown)
+    document.body.style.overflow = "hidden"
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown)
+      document.body.style.overflow = ""
+    }
+  }, [menuOpen])
 
   const onLogout = async () => {
     await services.logout()
     router.replace("/sign-in")
   }
 
+  const closeMenu = () => setMenuOpen(false)
+
   return (
-    <header
-      className={`app-header app-header--${position} app-header--${props.variant} ${className}`.trim()}
-      style={{ "--app-header-max": `${maxWidth}px` } as React.CSSProperties}
-    >
-      <div className="app-header-inner">
-        <CaribeLLMWordmark href={logoHref} className="app-header-logo" />
+    <>
+      <header
+        className={`app-header app-header--${position} app-header--${props.variant} ${className}`.trim()}
+        style={{ "--app-header-max": `${maxWidth}px` } as React.CSSProperties}
+      >
+        <div className="app-header-inner">
+          <CaribeLLMWordmark href={logoHref} className="app-header-logo" />
 
-        {props.variant === "public" && props.navLinks && props.navLinks.length > 0 ? (
-          <ul className="app-header-nav">
-            {props.navLinks.map((link) => (
-              <li key={link.href}>
-                {link.external ? (
-                  <a
-                    href={link.href}
-                    className={link.className ?? "app-header-nav-link"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <a href={link.href} className={link.className ?? "app-header-nav-link"}>
-                    {link.label}
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : null}
+          {navLinks && navLinks.length > 0 ? (
+            <ul className="app-header-nav app-header-nav--desktop">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      className={link.className ?? "app-header-nav-link"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <a href={link.href} className={link.className ?? "app-header-nav-link"}>
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : null}
 
-        <div className="app-header-actions">
-          {props.variant === "dashboard" ? (
-            <>
-              {showAdminLink && !onAdminRoute ? (
-                <Link href="/admin" className="app-header-btn-ghost-link">
-                  {header.adminLabel}
-                </Link>
-              ) : null}
-              {onAdminRoute ? (
-                <Link href="/dashboard" className="app-header-btn-ghost-link">
+          <div className="app-header-actions">
+            {props.variant === "dashboard" ? (
+              <>
+                {showAdminLink && !onAdminRoute ? (
+                  <Link href="/admin" className="app-header-btn-ghost-link">
+                    {header.adminLabel}
+                  </Link>
+                ) : null}
+                {onAdminRoute ? (
+                  <Link href="/dashboard" className="app-header-btn-ghost-link">
+                    {header.dashboardLabel}
+                  </Link>
+                ) : null}
+                <span className="app-header-user">{userDisplayName(user)}</span>
+                <button
+                  type="button"
+                  className="app-header-btn-ghost"
+                  onClick={() => void onLogout()}
+                >
+                  {header.logoutLabel}
+                </button>
+              </>
+            ) : stateService && isLoggedIn ? (
+              <>
+                {showAdminLink && !onAdminRoute ? (
+                  <Link href="/admin" className="app-header-btn-ghost-link">
+                    {header.adminLabel}
+                  </Link>
+                ) : null}
+                <Link href="/dashboard" className="app-header-btn-primary">
                   {header.dashboardLabel}
                 </Link>
-              ) : null}
-              <span className="app-header-user">{userDisplayName(user)}</span>
-              <button type="button" className="app-header-btn-ghost" onClick={() => void onLogout()}>
-                {header.logoutLabel}
-              </button>
-            </>
-          ) : stateService && isLoggedIn ? (
-            <>
-              {showAdminLink && !onAdminRoute ? (
-                <Link href="/admin" className="app-header-btn-ghost-link">
-                  {header.adminLabel}
+              </>
+            ) : (
+              <>
+                <Link href="/sign-in" className="app-header-signin app-header-signin--desktop">
+                  {header.loginLabel}
                 </Link>
-              ) : null}
-              <Link href="/dashboard" className="app-header-btn-primary">
-                {header.dashboardLabel}
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link href="/sign-in" className="app-header-signin">
-                {header.loginLabel}
-              </Link>
-              <Link href="/sign-up" className="app-header-btn-primary">
-                {header.signupLabel}
-              </Link>
-            </>
-          )}
+                <Link href="/sign-up" className="app-header-btn-primary">
+                  {header.signupLabel}
+                </Link>
+              </>
+            )}
+
+            {navLinks && navLinks.length > 0 ? (
+              <button
+                type="button"
+                className="app-header-menu-btn"
+                aria-expanded={menuOpen}
+                aria-controls="app-header-mobile-menu"
+                aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                <span className="menu-bar" />
+                <span className="menu-bar" />
+                <span className="menu-bar" />
+              </button>
+            ) : null}
+          </div>
         </div>
-      </div>
+      </header>
 
-      <style jsx global>{`
-        .wordmark {
-          font-family: var(--app-mono);
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--launch-text);
-          text-decoration: none;
-          letter-spacing: -0.01em;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-        }
+      {navLinks && navLinks.length > 0 ? (
+        <div
+          id="app-header-mobile-menu"
+          className={`app-header-mobile ${menuOpen ? "app-header-mobile--open" : ""}`}
+          aria-hidden={!menuOpen}
+        >
+          <button
+            type="button"
+            className="app-header-mobile-backdrop"
+            aria-label="Cerrar menú"
+            onClick={closeMenu}
+          />
+          <div className="app-header-mobile-panel">
+            <ul className="app-header-mobile-nav">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      className={link.className ?? "app-header-mobile-link"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={closeMenu}
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className={link.className ?? "app-header-mobile-link"}
+                      onClick={closeMenu}
+                    >
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
 
-        .wordmark :global(.wordmark-mark) {
-          flex-shrink: 0;
-        }
-
-        .wordmark :global(.wordmark-text) {
-          line-height: 1;
-        }
-
-        .wordmark:hover {
-          text-decoration: none;
-          color: var(--launch-text);
-        }
-
-        .wordmark-accent {
-          color: var(--launch-accent);
-        }
-
-        .wordmark-sep {
-          color: var(--launch-dim, var(--launch-muted));
-          font-weight: 400;
-          margin: 0 1px;
-        }
-      `}</style>
+            {props.variant === "public" && !(stateService && isLoggedIn) ? (
+              <div className="app-header-mobile-actions">
+                <Link href="/sign-in" className="app-header-mobile-signin" onClick={closeMenu}>
+                  {header.loginLabel}
+                </Link>
+                <Link href="/sign-up" className="app-header-mobile-cta" onClick={closeMenu}>
+                  {header.signupLabel}
+                </Link>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <style jsx>{`
         .app-header {
-          --launch-bg: #080b0b;
-          --launch-border: #1c2424;
-          --launch-text: #e8edec;
-          --launch-muted: #8aaba7;
-          --launch-accent: #00cfbd;
-          --launch-dim: #008f82;
-
           top: 0;
           z-index: 100;
           background: rgba(8, 11, 11, 0.88);
@@ -188,9 +240,6 @@ export default function AppHeader(props: AppHeaderProps) {
         .app-header--fixed {
           position: fixed;
           inset: 0 0 auto 0;
-          background: var(--launch-bg);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
         }
 
         .app-header--sticky {
@@ -320,12 +369,136 @@ export default function AppHeader(props: AppHeaderProps) {
           text-decoration: none;
         }
 
-        @media (max-width: 640px) {
-          .app-header-nav {
+        .app-header-menu-btn {
+          display: none;
+          flex-direction: column;
+          justify-content: center;
+          gap: 5px;
+          width: 44px;
+          height: 44px;
+          padding: 0;
+          margin: 0 -8px 0 4px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+        }
+
+        .menu-bar {
+          display: block;
+          width: 18px;
+          height: 2px;
+          background: var(--launch-text);
+          margin: 0 auto;
+        }
+
+        .app-header-mobile {
+          position: fixed;
+          inset: 0;
+          z-index: 200;
+          pointer-events: none;
+          visibility: hidden;
+        }
+
+        .app-header-mobile--open {
+          pointer-events: auto;
+          visibility: visible;
+        }
+
+        .app-header-mobile-backdrop {
+          position: absolute;
+          inset: 0;
+          border: none;
+          background: rgba(8, 11, 11, 0.72);
+          cursor: pointer;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+
+        .app-header-mobile--open .app-header-mobile-backdrop {
+          opacity: 1;
+        }
+
+        .app-header-mobile-panel {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: min(320px, 100%);
+          height: 100%;
+          background: var(--launch-surface);
+          border-left: 1px solid var(--launch-border);
+          padding: 72px 24px 32px;
+          transform: translateX(100%);
+          transition: transform 0.22s ease-out;
+          display: flex;
+          flex-direction: column;
+          gap: 32px;
+        }
+
+        .app-header-mobile--open .app-header-mobile-panel {
+          transform: translateX(0);
+        }
+
+        .app-header-mobile-nav {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: 4px;
+        }
+
+        .app-header-mobile-nav :global(.app-header-mobile-link) {
+          display: block;
+          padding: 12px 0;
+          font-size: 15px;
+          color: var(--launch-text);
+          text-decoration: none;
+          border-bottom: 1px solid var(--launch-border);
+        }
+
+        .app-header-mobile-nav :global(.gh) {
+          font-weight: 500;
+        }
+
+        .app-header-mobile-actions {
+          display: grid;
+          gap: 10px;
+          margin-top: auto;
+        }
+
+        .app-header-mobile-actions :global(.app-header-mobile-signin) {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 44px;
+          color: var(--launch-muted);
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          border: 1px solid var(--launch-border);
+        }
+
+        .app-header-mobile-actions :global(.app-header-mobile-cta) {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 44px;
+          background: var(--launch-accent);
+          color: #080b0b;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+          .app-header-nav--desktop {
             display: none;
           }
 
-          .app-header-actions :global(.app-header-signin) {
+          .app-header-menu-btn {
+            display: flex;
+          }
+
+          .app-header-actions :global(.app-header-signin--desktop) {
             display: none;
           }
 
@@ -334,6 +507,6 @@ export default function AppHeader(props: AppHeaderProps) {
           }
         }
       `}</style>
-    </header>
+    </>
   )
 }

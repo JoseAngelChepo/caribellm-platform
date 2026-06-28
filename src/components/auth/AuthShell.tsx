@@ -6,23 +6,13 @@ type AuthShellProps = {
 
 export default function AuthShell({ children }: AuthShellProps) {
   return (
-    <div className="auth-shell">
+    <div className="auth-shell launch-theme launch-theme--dashboard">
       <main className="auth-main">
         <div className="auth-card">{children}</div>
       </main>
 
       <style jsx>{`
         .auth-shell {
-          --launch-bg: #080b0b;
-          --launch-surface: #0f1414;
-          --launch-border: #1c2424;
-          --launch-text: #e8edec;
-          --launch-muted: #4a5a58;
-          --launch-accent: #00cfbd;
-          --launch-dim: #008f82;
-          --launch-danger: #f87171;
-          --launch-success: #22c55e;
-
           min-height: 100vh;
           background: var(--launch-bg);
           color: var(--launch-text);

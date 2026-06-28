@@ -9,23 +9,13 @@ type DashboardShellProps = {
 
 export default function DashboardShell({ children }: DashboardShellProps) {
   return (
-    <div className="dash-shell">
+    <div className="dash-shell launch-theme launch-theme--dashboard">
       <AppHeader variant="dashboard" />
 
       <main className="dash-main">{children}</main>
 
       <style jsx>{`
         .dash-shell {
-          --launch-bg: #080b0b;
-          --launch-surface: #0f1414;
-          --launch-border: #1c2424;
-          --launch-text: #e8edec;
-          --launch-muted: #4a5a58;
-          --launch-accent: #00cfbd;
-          --launch-dim: #008f82;
-          --launch-danger: #f87171;
-          --launch-success: #22c55e;
-
           min-height: 100vh;
           background: var(--launch-bg);
           color: var(--launch-text);

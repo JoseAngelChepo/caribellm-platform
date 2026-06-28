@@ -31,17 +31,64 @@ export default function CaribeLLMWordmark({
     </>
   )
 
+  const wordmarkClass = `wordmark ${className}`.trim()
+
+  const styles = (
+    <style jsx global>{`
+      .wordmark {
+        font-family: var(--app-mono);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--launch-text);
+        text-decoration: none;
+        letter-spacing: -0.01em;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .wordmark :global(.wordmark-mark) {
+        flex-shrink: 0;
+      }
+
+      .wordmark :global(.wordmark-text) {
+        line-height: 1;
+      }
+
+      .wordmark:hover {
+        text-decoration: none;
+        color: var(--launch-text);
+      }
+
+      .wordmark-accent {
+        color: var(--launch-accent);
+      }
+
+      .wordmark-sep {
+        color: var(--launch-dim, var(--launch-muted));
+        font-weight: 400;
+        margin: 0 1px;
+      }
+    `}</style>
+  )
+
   if (href) {
     return (
-      <Link href={href} className={`wordmark ${className}`.trim()} aria-label={ariaLabel}>
-        {content}
-      </Link>
+      <>
+        <Link href={href} className={wordmarkClass} aria-label={ariaLabel}>
+          {content}
+        </Link>
+        {styles}
+      </>
     )
   }
 
   return (
-    <span className={`wordmark ${className}`.trim()} aria-label={ariaLabel}>
-      {content}
-    </span>
+    <>
+      <span className={wordmarkClass} aria-label={ariaLabel}>
+        {content}
+      </span>
+      {styles}
+    </>
   )
 }

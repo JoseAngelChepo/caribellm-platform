@@ -1,0 +1,27 @@
+.launch-theme {
+  --launch-bg: #080b0b;
+  --launch-surface: #0f1414;
+  --launch-border: #1c2424;
+  --launch-text: #e8edec;
+  --launch-muted: #8aaba7;
+  --launch-accent: #00cfbd;
+  --launch-dim: #008f82;
+  --launch-green: #22c55e;
+  --launch-danger: #f87171;
+  --launch-success: #22c55e;
+
+  --launch-body-size: 16px;
+  --launch-lede-size: 18px;
+  --launch-prose-width: 40rem;
+  --launch-prose-leading: 1.7;
+  --launch-section-y: 80px;
+  --launch-text-display: clamp(36px, 4.2vw, 56px);
+  --launch-text-h2: clamp(22px, 2.8vw, 28px);
+
+  background: var(--launch-bg);
+  color: var(--launch-text);
+}
+
+.launch-theme--dashboard {
+  --launch-muted: #4a5a58;
+}

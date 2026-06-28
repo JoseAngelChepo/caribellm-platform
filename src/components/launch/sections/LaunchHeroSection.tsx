@@ -1,4 +1,5 @@
-import HeroPrompt from "@/components/launch/HeroPrompt"
+import LaunchButton from "@/components/launch/LaunchButton"
+import LaunchTerminalDemo from "@/components/launch/LaunchTerminalDemo"
 import { launchContent } from "@/content/launch"
 
 const { hero } = launchContent
@@ -6,183 +7,103 @@ const { hero } = launchContent
 export default function LaunchHeroSection() {
   return (
     <section className="hero" id="inicio" aria-labelledby="launch-title">
-      <div className="hero-inner">
-        <HeroPrompt text={hero.prompt} />
-
-        <h1 id="launch-title">
-          <span className="title-main">{hero.title}</span>
-          <span className="title-second">
-            {hero.titleAccent}
-            <span className="title-highlight">{hero.titleAccentHighlight}</span>
-          </span>
-        </h1>
-
+      <div className="hero-grid">
         <div className="hero-copy">
+          <h1 id="launch-title">
+            {hero.title}
+            <span className="title-line">{hero.titleLine2}</span>
+          </h1>
+
           <p className="hero-lede">{hero.lede}</p>
-          <p className="hero-lede">{hero.ledeContinued}</p>
+
+          <div className="hero-actions">
+            <LaunchButton href={hero.primaryCta.href} size="lg">
+              {hero.primaryCta.label}
+            </LaunchButton>
+            {/* GitHub CTA — ver secondaryCta en launch.ts */}
+          </div>
         </div>
 
-        <nav className="hero-links" aria-label="Enlaces principales">
-          {hero.links.map((link, index) => (
-            <span key={link.href} className="hero-link-wrap">
-              {index > 0 ? <span className="hero-link-sep" aria-hidden="true">·</span> : null}
-              {link.external || link.href.startsWith("http") ? (
-                <a href={link.href} target="_blank" rel="noopener noreferrer" className="hero-link">
-                  {link.label}
-                </a>
-              ) : (
-                <a href={link.href} className="hero-link">
-                  {link.label}
-                </a>
-              )}
-            </span>
-          ))}
-        </nav>
-
-        <div className="hero-stack" aria-label="Etiquetas">
-          {hero.tags.map((tag) => (
-            <span key={tag} className="tag">
-              {tag}
-            </span>
-          ))}
+        <div className="hero-demo">
+          <LaunchTerminalDemo />
         </div>
       </div>
 
       <style jsx>{`
         .hero {
-          display: flex;
-          justify-content: center;
-          padding: 120px 0 88px;
+          padding: 112px 0 80px;
           border-bottom: 1px solid var(--launch-border);
         }
 
-        .hero-inner {
-          display: flex;
-          flex-direction: column;
+        .hero-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.05fr) minmax(300px, 440px);
+          gap: 64px;
           align-items: center;
-          text-align: center;
-          width: 100%;
-          max-width: 44rem;
         }
 
-        .hero-inner :global(.hero-prompt) {
-          justify-content: center;
-          margin-bottom: 28px;
+        .hero-copy {
+          text-align: left;
         }
 
         .hero h1 {
           font-family: var(--app-title-font);
-          font-size: clamp(40px, 5.5vw, 68px);
-          font-weight: 700;
-          line-height: 1.1;
-          letter-spacing: -0.032em;
-          margin: 0 0 28px;
-          width: 100%;
-        }
-
-        .title-main,
-        .title-second {
-          display: block;
-        }
-
-        .title-second {
-          color: var(--launch-text);
+          font-size: clamp(34px, 3.8vw, 52px);
           font-weight: 600;
+          line-height: 1.1;
+          letter-spacing: -0.028em;
+          color: var(--launch-text);
+          margin: 0 0 18px;
+          max-width: 14em;
         }
 
-        .title-highlight {
-          color: var(--launch-accent);
-          font-weight: 700;
-        }
-
-        .hero-copy {
-          display: grid;
-          gap: 12px;
-          width: 100%;
-          margin-bottom: 32px;
+        .title-line {
+          display: block;
         }
 
         .hero-lede {
           font-size: var(--launch-lede-size);
           color: var(--launch-muted);
-          line-height: var(--launch-prose-leading);
-          margin: 0;
+          line-height: 1.6;
+          margin: 0 0 32px;
+          max-width: 28rem;
         }
 
-        .hero-links {
+        .hero-actions {
           display: flex;
           flex-wrap: wrap;
-          justify-content: center;
           align-items: center;
-          gap: 6px 18px;
-          margin-bottom: 32px;
+          gap: 8px 20px;
         }
 
-        .hero-link-wrap {
-          display: inline-flex;
-          align-items: center;
-          gap: 18px;
+        .hero-demo {
+          width: 100%;
         }
 
-        .hero-link-sep {
-          color: var(--launch-border);
-          font-family: var(--app-mono);
-          font-size: 13px;
-          user-select: none;
-        }
+        @media (max-width: 900px) {
+          .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+            align-items: start;
+          }
 
-        .hero-link {
-          font-size: 15px;
-          font-weight: 500;
-          color: var(--launch-text);
-          text-decoration: underline;
-          text-underline-offset: 4px;
-          text-decoration-color: var(--launch-border);
-          transition:
-            color 0.15s,
-            text-decoration-color 0.15s;
-        }
+          .hero h1 {
+            max-width: none;
+          }
 
-        .hero-link:hover {
-          color: var(--launch-accent);
-          text-decoration-color: var(--launch-accent);
-        }
-
-        .hero-stack {
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-
-        .tag {
-          font-family: var(--app-mono);
-          font-size: 12px;
-          color: var(--launch-muted);
-          background: var(--launch-surface);
-          border: 1px solid var(--launch-border);
-          padding: 5px 11px;
-          letter-spacing: 0.02em;
+          .hero-lede {
+            max-width: none;
+          }
         }
 
         @media (max-width: 640px) {
           .hero {
-            padding-top: 100px;
-            padding-bottom: 64px;
+            padding-top: 96px;
+            padding-bottom: 56px;
           }
 
-          .hero-inner {
-            max-width: 100%;
-          }
-
-          .hero h1 {
-            font-size: clamp(34px, 9vw, 44px);
-            margin-bottom: 22px;
-          }
-
-          .hero-copy {
-            gap: 10px;
-            margin-bottom: 24px;
+          .hero-actions :global(.launch-btn--primary) {
+            width: 100%;
           }
         }
       `}</style>

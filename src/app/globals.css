@@ -11,9 +11,9 @@
   --app-text: #18181b;
   --app-text-muted: #71717a;
   --app-text-faint: #a1a1aa;
-  --app-primary: #2563eb;
-  --app-primary-hover: #1d4ed8;
-  --app-primary-soft: #eff6ff;
+  --app-primary: #00cfbd;
+  --app-primary-hover: #008f82;
+  --app-primary-soft: rgba(0, 207, 189, 0.12);
   --app-danger: #dc2626;
   --app-danger-bg: #fef2f2;
   --app-danger-border: #fecaca;
@@ -38,8 +38,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--app-bg);
-  color: var(--app-text);
+  background: #080b0b;
+  color: #e8edec;
   font-family: var(--app-font);
   font-size: 16px;
   line-height: 1.5;

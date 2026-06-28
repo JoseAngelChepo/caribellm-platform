@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Providers } from "@/app/providers"
 import { appFont, appMonoFont, appTitleFont } from "@/config/fonts"
 import "./globals.css"
+import "@/styles/launch-theme.css"
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${appFont.variable} ${appTitleFont.variable} ${appMonoFont.variable}`}>
+      <body
+        className={`launch-theme ${appFont.variable} ${appTitleFont.variable} ${appMonoFont.variable}`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
