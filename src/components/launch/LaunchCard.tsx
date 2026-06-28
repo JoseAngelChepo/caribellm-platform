@@ -11,7 +11,9 @@ export default function LaunchCard({ children, className = "" }: LaunchCardProps
         .launch-card {
           padding: 32px 28px;
           border: 1px solid var(--launch-border);
-          background: var(--launch-surface);
+          border-radius: var(--launch-radius);
+          background: linear-gradient(180deg, var(--launch-surface) 0%, var(--launch-bg-elevated) 100%);
+          box-shadow: var(--launch-shadow-md);
         }
       `}</style>
     </article>

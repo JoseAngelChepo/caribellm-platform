@@ -16,6 +16,7 @@ export type LaunchLink = {
 }
 
 export type LaunchUseBlock = {
+  icon: "api" | "node"
   title: string
   description: string
   links?: LaunchLink[]
@@ -48,31 +49,50 @@ export const launchContent = {
     ] satisfies LaunchNavItem[],
   },
   hero: {
-    title: "Inferencia compartida",
-    titleLine2: "para Venezuela y el Caribe.",
-    lede: "API compatible con OpenAI. Gratis para quien construye en la región.",
+    prompt: "caribellm@archipielago:~$",
+    titleLead: "Inferencia compartida para",
+    titleHighlight: "Venezuela y el Caribe",
+    lede: "Una API compatible con OpenAI, sostenida por la comunidad. Cambias una línea en tu código y tu proyecto corre sobre la red.",
     primaryCta: { label: "Crear cuenta", href: "/sign-up" },
-    // secondaryCta: { label: "GitHub", href: "https://github.com/caribellm", external: true as const },
+    secondaryCta: { label: "Cómo funciona", href: "#uso" },
+    tags: ["compatible con OpenAI", "gratis para la región", "open source"],
   },
   use: {
     id: "uso",
-    title: "Dos formas de participar",
+    eyebrow: "cómo funciona",
+    title: "Un router de modelos para build4venezuela",
+    lede: "CaribeLLM provee inferencia a los proyectos que forman parte de build4venezuela.com. Conectas tu cliente de OpenAI a nuestra URL y usas los modelos directamente, sin abrir cuenta con cada proveedor.",
+    pool: {
+      amount: "$100",
+      label: "Pool que estamos cubriendo para los proyectos, por ahora.",
+    },
+    models: {
+      title: "Modelos disponibles hoy",
+      note: "Compatibles 1:1 con la API de OpenAI.",
+      items: ["gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-5-mini", "gpt-5-nano"],
+    },
     blocks: [
       {
+        icon: "api",
         title: "Usa la API",
-        description: "Registro, API key, cambias OPENAI_BASE_URL. El resto igual.",
+        description:
+          "Te registras, generas una API key y apuntas tu cliente de OpenAI a CaribeLLM. El resto de tu código queda igual.",
         links: [{ label: "Crear cuenta", href: "/sign-up" }],
       },
       {
+        icon: "node",
         title: "Corre un nodo",
-        description: "WebLLM en una pestaña. Sin instalar nada. Opcional.",
+        description:
+          "Aporta capacidad libre desde el navegador con WebLLM. Sin instalar nada. Opcional, pero suma a la red.",
         links: [{ label: "Abrir /node", href: "/node" }],
       },
     ] satisfies LaunchUseBlock[],
   },
   phases: {
     id: "fases",
-    title: "Dónde estamos",
+    eyebrow: "hoja de ruta",
+    title: "Un proyecto que crece por fases",
+    lede: "Estamos en la primera fase. Esto es lo que funciona hoy y hacia dónde va.",
     stages: [
       {
         id: 1,
@@ -96,10 +116,12 @@ export const launchContent = {
   },
   faq: {
     id: "faq",
+    eyebrow: "preguntas",
+    title: "Lo esencial, claro",
     items: [
       {
         question: "¿Cuánto cuesta?",
-        answer: "Nada, por ahora. Pensado para quien construye para la región.",
+        answer: "Por ahora nada: estamos cubriendo un pool de 100 USD para los proyectos de build4venezuela.",
       },
       {
         question: "¿Qué cambio en mi código?",
