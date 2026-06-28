@@ -1,27 +1,47 @@
 "use client"
 
+import Link from "next/link"
+import AnimatedNetworkBackground from "@/components/launch/AnimatedNetworkBackground"
+import CaribeLLMMark from "@/components/ui/CaribeLLMMark"
+
 type AuthShellProps = {
   children: React.ReactNode
 }
 
 export default function AuthShell({ children }: AuthShellProps) {
   return (
-    <div className="auth-shell launch-theme launch-theme--dashboard">
+    <div className="auth-shell launch-theme">
+      <AnimatedNetworkBackground className="auth-net" density={0.7} />
+
       <main className="auth-main">
-        <div className="auth-card">{children}</div>
+        <div className="auth-stack">
+          <Link href="/" className="auth-brand" aria-label="CaribeLLM — inicio">
+            <CaribeLLMMark size={26} className="auth-brand-mark" />
+            <span className="auth-brand-name">CaribeLLM</span>
+          </Link>
+
+          <div className="auth-card">{children}</div>
+        </div>
       </main>
 
       <style jsx>{`
         .auth-shell {
+          position: relative;
           min-height: 100vh;
-          background: var(--launch-bg);
           color: var(--launch-text);
           font-family: var(--app-font);
           font-size: 15px;
           line-height: 1.6;
+          overflow: hidden;
+        }
+
+        .auth-shell :global(.auth-net) {
+          z-index: 0;
         }
 
         .auth-main {
+          position: relative;
+          z-index: 1;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -29,9 +49,52 @@ export default function AuthShell({ children }: AuthShellProps) {
           padding: 24px;
         }
 
-        .auth-card {
+        .auth-stack {
           width: 100%;
           max-width: 420px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 24px;
+        }
+
+        .auth-brand {
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          color: var(--launch-accent);
+          text-decoration: none;
+        }
+
+        .auth-brand-name {
+          font-family: var(--app-mono);
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--launch-text);
+        }
+
+        .auth-card {
+          position: relative;
+          width: 100%;
+          padding: 36px 32px;
+          background: linear-gradient(
+            180deg,
+            var(--launch-surface) 0%,
+            var(--launch-bg-elevated) 100%
+          );
+          border: 1px solid var(--launch-border-strong);
+          border-radius: var(--launch-radius);
+          box-shadow: var(--launch-shadow-lg);
+          overflow: hidden;
+        }
+
+        .auth-card::before {
+          content: "";
+          position: absolute;
+          inset: 0 0 auto 0;
+          height: 1px;
+          background: var(--launch-gradient);
+          opacity: 0.8;
         }
 
         /* —— Form primitives (shared by SignInForm / SignUpForm) —— */
@@ -50,10 +113,10 @@ export default function AuthShell({ children }: AuthShellProps) {
         .auth-shell :global(.auth-title) {
           margin: 0 0 8px;
           font-family: var(--app-title-font);
-          font-size: clamp(1.75rem, 4vw, 2rem);
+          font-size: clamp(1.85rem, 4vw, 2.15rem);
           font-weight: 700;
           letter-spacing: -0.025em;
-          line-height: 1.15;
+          line-height: 1.12;
           color: var(--launch-text);
         }
 
@@ -78,13 +141,13 @@ export default function AuthShell({ children }: AuthShellProps) {
 
         .auth-shell :global(.auth-input) {
           width: 100%;
-          padding: 11px 12px;
+          padding: 12px 13px;
           font-family: var(--app-font);
           font-size: 14px;
           color: var(--launch-text);
-          background: var(--launch-bg);
+          background: rgba(0, 0, 0, 0.25);
           border: 1px solid var(--launch-border);
-          border-radius: 0;
+          border-radius: var(--launch-radius-sm);
           outline: none;
           transition:
             border-color 0.15s ease,
@@ -92,12 +155,12 @@ export default function AuthShell({ children }: AuthShellProps) {
         }
 
         .auth-shell :global(.auth-input::placeholder) {
-          color: var(--launch-muted);
+          color: var(--launch-faint);
         }
 
         .auth-shell :global(.auth-input:focus) {
           border-color: var(--launch-accent);
-          box-shadow: 0 0 0 1px rgba(0, 207, 189, 0.25);
+          box-shadow: 0 0 0 3px var(--launch-accent-soft);
         }
 
         .auth-shell :global(.auth-error) {
@@ -132,6 +195,7 @@ export default function AuthShell({ children }: AuthShellProps) {
           padding: 10px 12px;
           font-size: 13px;
           color: var(--launch-danger);
+          border-radius: var(--launch-radius-sm);
           background: rgba(248, 113, 113, 0.08);
           border: 1px solid rgba(248, 113, 113, 0.25);
         }
@@ -212,6 +276,9 @@ export default function AuthShell({ children }: AuthShellProps) {
         }
 
         @media (max-width: 480px) {
+          .auth-card {
+            padding: 30px 22px;
+          }
           .auth-shell :global(.auth-row) {
             grid-template-columns: 1fr;
           }

@@ -76,17 +76,21 @@ export default function Button({
           border-color: var(--app-primary-hover);
         }
         .btn--launch {
-          margin-top: 8px;
-          background: #00cfbd;
-          color: #080b0b;
-          border: 1px solid #00cfbd;
+          margin-top: 10px;
+          padding: 0.7rem 1rem;
+          background: var(--launch-accent, #14d6c2);
+          color: #04100f;
+          border: 1px solid var(--launch-accent, #14d6c2);
           font-weight: 700;
-          border-radius: 0;
+          border-radius: 9px;
+          transition:
+            background 0.15s ease,
+            border-color 0.15s ease;
         }
         .btn--launch:hover:not(:disabled) {
-          background: #008f82;
-          border-color: #008f82;
-          color: #fff;
+          background: #2ee3d0;
+          border-color: #2ee3d0;
+          color: #04100f;
         }
         .btn:disabled {
           opacity: 0.55;

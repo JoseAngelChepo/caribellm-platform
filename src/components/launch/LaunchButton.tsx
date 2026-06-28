@@ -44,6 +44,7 @@ export default function LaunchButton({
       {content}
       <style jsx global>{`
         .launch-btn {
+          position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -51,11 +52,12 @@ export default function LaunchButton({
           font-weight: 600;
           text-decoration: none;
           border: 1px solid transparent;
+          border-radius: 9px;
           cursor: pointer;
           transition:
-            background 0.15s,
-            color 0.15s,
-            border-color 0.15s;
+            background 0.15s ease,
+            color 0.15s ease,
+            border-color 0.15s ease;
           white-space: nowrap;
         }
 
@@ -66,37 +68,35 @@ export default function LaunchButton({
         .launch-btn--md {
           font-size: 14px;
           padding: 10px 18px;
-          min-height: 44px;
-          border-radius: 4px;
+          min-height: 42px;
         }
 
         .launch-btn--lg {
           font-size: 15px;
-          padding: 11px 20px;
-          min-height: 44px;
-          border-radius: 4px;
+          padding: 12px 22px;
+          min-height: 46px;
         }
 
         .launch-btn--primary {
           background: var(--launch-accent);
-          color: #080b0b;
+          color: #04100f;
           border-color: var(--launch-accent);
         }
 
         .launch-btn--primary:hover {
-          background: var(--launch-dim);
-          border-color: var(--launch-dim);
-          color: #fff;
+          background: #2ee3d0;
+          border-color: #2ee3d0;
+          color: #04100f;
         }
 
         .launch-btn--secondary {
           background: transparent;
           color: var(--launch-text);
-          border-color: var(--launch-border);
+          border-color: var(--launch-border-strong);
         }
 
         .launch-btn--secondary:hover {
-          border-color: var(--launch-muted);
+          border-color: var(--launch-accent);
           color: var(--launch-text);
         }
 

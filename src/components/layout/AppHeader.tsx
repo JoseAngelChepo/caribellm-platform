@@ -231,9 +231,9 @@ export default function AppHeader(props: AppHeaderProps) {
         .app-header {
           top: 0;
           z-index: 100;
-          background: rgba(8, 11, 11, 0.88);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
+          background: rgba(7, 11, 12, 0.72);
+          backdrop-filter: blur(16px) saturate(140%);
+          -webkit-backdrop-filter: blur(16px) saturate(140%);
           border-bottom: 1px solid var(--launch-border);
         }
 
@@ -323,18 +323,22 @@ export default function AppHeader(props: AppHeaderProps) {
 
         .app-header-actions :global(.app-header-btn-primary) {
           background: var(--launch-accent);
-          color: #080b0b;
+          color: #04100f;
           text-decoration: none;
           font-size: 13px;
           font-weight: 700;
-          padding: 7px 14px;
-          border: none;
-          transition: background 0.15s;
+          padding: 8px 15px;
+          border: 1px solid var(--launch-accent);
+          border-radius: 8px;
+          transition:
+            background 0.15s,
+            border-color 0.15s;
         }
 
         .app-header-actions :global(.app-header-btn-primary:hover) {
-          background: var(--launch-dim);
-          color: #fff;
+          background: #2ee3d0;
+          border-color: #2ee3d0;
+          color: #04100f;
           text-decoration: none;
         }
 
@@ -408,7 +412,7 @@ export default function AppHeader(props: AppHeaderProps) {
           position: absolute;
           inset: 0;
           border: none;
-          background: rgba(8, 11, 11, 0.72);
+          background: rgba(5, 9, 10, 0.78);
           cursor: pointer;
           opacity: 0;
           transition: opacity 0.2s;
@@ -483,10 +487,11 @@ export default function AppHeader(props: AppHeaderProps) {
           justify-content: center;
           min-height: 44px;
           background: var(--launch-accent);
-          color: #080b0b;
+          color: #04100f;
           text-decoration: none;
           font-size: 14px;
           font-weight: 700;
+          border-radius: 8px;
         }
 
         @media (max-width: 768px) {
