@@ -35,7 +35,7 @@ export default function HeroPrompt({ text }: HeroPromptProps) {
           font-family: var(--app-mono);
           font-size: 13px;
           color: var(--launch-accent);
-          margin: 4px 0 28px;
+          margin: 0;
           display: flex;
           align-items: center;
           justify-content: center;

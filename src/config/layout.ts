@@ -2,5 +2,5 @@
 export const layoutContent = {
   publicMaxWidth: 1120,
   dashboardMaxWidth: 1280,
-  paddingX: 20,
+  paddingX: 28,
 } as const
