@@ -6,10 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5"
 import { toast } from "@/lib/toast"
 import Button from "@/components/ui/Button"
-import GoogleAuthButton from "@/components/auth/GoogleAuthButton"
+// import GoogleAuthButton from "@/components/auth/GoogleAuthButton"
 import { useServices } from "@/data/providers/ServicesProvider"
 import { useMessages } from "@/i18n/client"
-import { NEXT_PUBLIC_API_URL } from "@/config/env"
+// import { NEXT_PUBLIC_API_URL } from "@/config/env"
 import {
   isUsernameFormatValid,
   normalizeUsername,
@@ -139,12 +139,12 @@ export default function SignUpForm() {
     ? `/sign-in?redirect=${encodeURIComponent(redirectPath)}`
     : "/sign-in"
 
-  const onGoogleSignUp = () => {
-    const state = btoa(JSON.stringify({ redirect: redirectPath || "/dashboard" }))
-    window.location.assign(
-      `${NEXT_PUBLIC_API_URL}/auth/google?state=${encodeURIComponent(state)}`,
-    )
-  }
+  // const onGoogleSignUp = () => {
+  //   const state = btoa(JSON.stringify({ redirect: redirectPath || "/dashboard" }))
+  //   window.location.assign(
+  //     `${NEXT_PUBLIC_API_URL}/auth/google?state=${encodeURIComponent(state)}`,
+  //   )
+  // }
 
   return (
     <div className="auth-form">
@@ -309,10 +309,12 @@ export default function SignUpForm() {
           </Button>
         </div>
       </form>
+      {/* Google OAuth — reactivar cuando esté listo
       <div className="auth-divider" role="separator">
         <span>o</span>
       </div>
       <GoogleAuthButton variant="launch" text="Registrarse con Google" onClick={onGoogleSignUp} />
+      */}
       <button type="button" className="auth-footer" onClick={() => router.push(signInPath)}>
         ¿Ya tienes cuenta? Iniciar sesión
       </button>

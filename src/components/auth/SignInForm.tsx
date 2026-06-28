@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form"
 import { useRouter, useSearchParams } from "next/navigation"
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5"
 import Button from "@/components/ui/Button"
-import GoogleAuthButton from "@/components/auth/GoogleAuthButton"
+// import GoogleAuthButton from "@/components/auth/GoogleAuthButton"
 import { useServices } from "@/data/providers/ServicesProvider"
 import { useMessages } from "@/i18n/client"
-import { NEXT_PUBLIC_API_URL } from "@/config/env"
+// import { NEXT_PUBLIC_API_URL } from "@/config/env"
 
 type FormValues = {
   email: string
@@ -52,12 +52,12 @@ export default function SignInForm() {
     ? `/sign-up?redirect=${encodeURIComponent(redirectPath)}`
     : "/sign-up"
 
-  const onGoogleLogin = () => {
-    const state = btoa(JSON.stringify({ redirect: redirectPath || "/dashboard" }))
-    window.location.assign(
-      `${NEXT_PUBLIC_API_URL}/auth/google?state=${encodeURIComponent(state)}`,
-    )
-  }
+  // const onGoogleLogin = () => {
+  //   const state = btoa(JSON.stringify({ redirect: redirectPath || "/dashboard" }))
+  //   window.location.assign(
+  //     `${NEXT_PUBLIC_API_URL}/auth/google?state=${encodeURIComponent(state)}`,
+  //   )
+  // }
 
   return (
     <div className="auth-form">
@@ -116,10 +116,12 @@ export default function SignInForm() {
           </Button>
         </div>
       </form>
+      {/* Google OAuth — reactivar cuando esté listo
       <div className="auth-divider" role="separator">
         <span>o</span>
       </div>
       <GoogleAuthButton variant="launch" text="Continuar con Google" onClick={onGoogleLogin} />
+      */}
       <button type="button" className="auth-footer" onClick={() => router.push(signUpPath)}>
         ¿No tienes cuenta? Crear cuenta
       </button>
