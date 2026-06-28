@@ -9,29 +9,35 @@ const svgPath = join(root, "src/brand/caribellm-mark.svg")
 const appDir = join(root, "src/app")
 const svg = readFileSync(svgPath)
 
-// Rasterize at high density, then downscale for sharper favicon edges.
-const master = await sharp(svg, { density: 384 })
-  .resize(128, 128, { kernel: sharp.kernel.lanczos3 })
-  .png({ compressionLevel: 9, palette: false })
-  .toBuffer()
+/** High-DPI SVG raster → crisp downscale for small ICO/PNG sizes. */
+const SVG_DENSITY = 384
+const MASTER_PX = 512
 
-const png32 = await sharp(master)
-  .resize(32, 32, { kernel: sharp.kernel.lanczos3 })
-  .png({ compressionLevel: 9 })
-  .toBuffer()
+async function rasterize(targetPx) {
+  return sharp(svg, { density: SVG_DENSITY })
+    .resize(MASTER_PX, MASTER_PX, {
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .resize(targetPx, targetPx, {
+      kernel: sharp.kernel.lanczos3,
+      fit: "fill",
+    })
+    .png({
+      compressionLevel: 9,
+      palette: false,
+      quality: 100,
+      effort: 10,
+    })
+    .toBuffer()
+}
 
-const png16 = await sharp(master)
-  .resize(16, 16, { kernel: sharp.kernel.lanczos3 })
-  .png({ compressionLevel: 9 })
-  .toBuffer()
+const png16 = await rasterize(16)
+const png32 = await rasterize(32)
+const png48 = await rasterize(48)
+const png180 = await rasterize(180)
 
-const png180 = await sharp(master)
-  .resize(180, 180, { kernel: sharp.kernel.lanczos3 })
-  .png({ compressionLevel: 9 })
-  .toBuffer()
-
-writeFileSync(join(appDir, "icon.png"), png32)
+writeFileSync(join(appDir, "favicon.ico"), await toIco([png16, png32, png48]))
 writeFileSync(join(appDir, "apple-icon.png"), png180)
-writeFileSync(join(appDir, "favicon.ico"), await toIco([png16, png32]))
 
-console.log("Wrote src/app/icon.png, apple-icon.png, favicon.ico")
+console.log("Wrote src/app/favicon.ico (16/32/48) and apple-icon.png (180)")

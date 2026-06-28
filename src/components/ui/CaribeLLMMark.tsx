@@ -1,9 +1,5 @@
-import {
-  brandMarkColor,
-  brandMarkCrest,
-  brandMarkUndertow,
-  brandMarkViewBox,
-} from "@/brand/mark"
+import { BrandMarkGraphic } from "@/brand/BrandMarkGraphic"
+import { brandMarkViewBox } from "@/brand/mark"
 
 type CaribeLLMMarkProps = {
   size?: number
@@ -14,7 +10,7 @@ type CaribeLLMMarkProps = {
 
 export default function CaribeLLMMark({
   size = 20,
-  color = brandMarkColor,
+  color,
   className = "",
   title,
 }: CaribeLLMMarkProps) {
@@ -24,30 +20,15 @@ export default function CaribeLLMMark({
       height={size}
       viewBox={brandMarkViewBox}
       fill="none"
-      shapeRendering="geometricPrecision"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
+      shapeRendering="geometricPrecision"
       aria-hidden={title ? undefined : true}
       role={title ? "img" : undefined}
+      style={{ display: "block" }}
     >
       {title ? <title>{title}</title> : null}
-      <path
-        d={brandMarkCrest.d}
-        stroke={color}
-        strokeWidth={brandMarkCrest.width}
-        strokeLinecap="round"
-        strokeLinejoin="miter"
-        strokeMiterlimit={4}
-        fill="none"
-      />
-      <path
-        d={brandMarkUndertow.d}
-        stroke={color}
-        strokeWidth={brandMarkUndertow.width}
-        strokeLinecap="square"
-        strokeLinejoin="miter"
-        strokeMiterlimit={4}
-        fill="none"
-      />
+      <BrandMarkGraphic color={color} />
     </svg>
   )
 }
