@@ -60,6 +60,132 @@ export type ApiKeyListItem = {
 
 export type CreateApiKeyResponse = ApiKeyListItem & { key: string }
 
+export type AdminUser = {
+  id: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  role: "user" | "admin" | string
+  isActive: boolean
+  isEmailVerified: boolean
+  authProvider: string
+  accountTier: string
+  canCreateApiKeys: boolean
+  createdAt?: string
+  lastLogin?: string | null
+}
+
+export type AdminUserListResult = {
+  items: AdminUser[]
+  total: number
+  page: number
+  limit: number
+}
+
+export type AdminUserDetail = AdminUser & {
+  credits: number | null
+  activeApiKeys: number
+  apiKeys: ApiKeyListItem[]
+}
+
+export type AdminUpdateUserPayload = {
+  role?: "user" | "admin"
+  isActive?: boolean
+  canCreateApiKeys?: boolean
+  accountTier?: string
+  firstName?: string
+  lastName?: string
+  isEmailVerified?: boolean
+}
+
+export type AdminListUsersParams = {
+  page?: number
+  limit?: number
+  search?: string
+  canCreateApiKeys?: boolean
+}
+
+export type AdminUsageUserRow = {
+  userId: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  creditsAvailable: number
+  creditsUsed: number
+  inferenceCount: number
+  totalInputTokens: number
+  totalOutputTokens: number
+  providerCostUsd: number
+  lastActivityAt: string | null
+  lastModel: string | null
+}
+
+export type AdminUsageSummaryResponse = {
+  totals: {
+    creditsAvailable: number
+    creditsUsed: number
+    creditsReceived: number
+    lifetimePaid: number
+    providerCostUsd: number
+    inferenceCount: number
+    totalInputTokens: number
+    totalOutputTokens: number
+    walletCount: number
+    activeUsers: number
+    creditsUsedPct: number
+    requestsWithMissingTokens?: number
+  }
+  dailyUsage: Array<{
+    key: string
+    label: string
+    credits: number
+    requests: number
+    pct: number
+  }>
+  modelUsage: Array<{
+    model: string
+    credits: number
+    requests: number
+    inputTokens: number
+    outputTokens: number
+    pct: number
+  }>
+  userUsage: AdminUsageUserRow[]
+}
+
+export type AdminWalletRow = {
+  id: string
+  userId: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  credits: number
+  lifetimePaid: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type AdminWalletListParams = {
+  page?: number
+  limit?: number
+  search?: string
+}
+
+export type AdminWalletListResult = {
+  items: AdminWalletRow[]
+  total: number
+  page: number
+  limit: number
+  totals: {
+    walletCount: number
+    totalCredits: number
+    totalLifetimePaid: number
+  }
+}
+
 export type UsageSummaryResponse = {
   creditsAvailable: number
   creditsUsed: number
@@ -101,6 +227,12 @@ export type ServicesApi = {
   listApiKeys: () => Promise<ApiKeyListItem[]>
   createApiKey: (name?: string) => Promise<CreateApiKeyResponse>
   revokeApiKey: (id: string) => Promise<void>
+  listAdminUsers: (params?: AdminListUsersParams) => Promise<AdminUserListResult>
+  getAdminUser: (id: string) => Promise<AdminUserDetail>
+  updateAdminUser: (id: string, data: AdminUpdateUserPayload) => Promise<AdminUser>
+  setAdminUserApiKeyAccess: (id: string, canCreateApiKeys: boolean) => Promise<AdminUser>
+  getAdminUsageSummary: () => Promise<AdminUsageSummaryResponse>
+  listAdminWallets: (params?: AdminWalletListParams) => Promise<AdminWalletListResult>
 }
 
 function createServices(api: AxiosInstance): ServicesApi {
@@ -139,6 +271,20 @@ function createServices(api: AxiosInstance): ServicesApi {
     createApiKey: (name) =>
       api.post("/api-keys", { name }).then((r) => r.data as CreateApiKeyResponse),
     revokeApiKey: (id) => api.delete(`/api-keys/${id}`).then(() => undefined),
+    listAdminUsers: (params) =>
+      api.get<AdminUserListResult>("/admin/users", { params }).then((r) => r.data),
+    getAdminUser: (id) =>
+      api.get<AdminUserDetail>(`/admin/users/${id}`).then((r) => r.data),
+    updateAdminUser: (id, data) =>
+      api.patch<AdminUser>(`/admin/users/${id}`, data).then((r) => r.data),
+    setAdminUserApiKeyAccess: (id, canCreateApiKeys) =>
+      api
+        .patch<AdminUser>(`/admin/users/${id}/api-key-access`, { canCreateApiKeys })
+        .then((r) => r.data),
+    getAdminUsageSummary: () =>
+      api.get<AdminUsageSummaryResponse>("/admin/usage/summary").then((r) => r.data),
+    listAdminWallets: (params) =>
+      api.get<AdminWalletListResult>("/admin/wallets", { params }).then((r) => r.data),
   }
 }
 

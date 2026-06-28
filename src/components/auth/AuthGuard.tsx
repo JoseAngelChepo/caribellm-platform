@@ -54,7 +54,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       cleanPathname === "/sign-in" ||
       cleanPathname === "/sign-up" ||
       cleanPathname === "/auth/google/callback" ||
-      cleanPathname.startsWith("/dashboard")
+      cleanPathname.startsWith("/dashboard") ||
+      cleanPathname.startsWith("/admin")
     return <Loader theme={isLaunchThemeRoute ? "launch" : "default"} />
   }
   return <>{children}</>

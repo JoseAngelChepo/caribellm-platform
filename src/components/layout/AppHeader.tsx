@@ -1,11 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import CaribeLLMWordmark from "@/components/ui/CaribeLLMWordmark"
 import { brandContent } from "@/content/brand"
 import { layoutContent } from "@/config/layout"
 import { useServices } from "@/data/providers/ServicesProvider"
+import { isAdminRole } from "@/lib/roles"
 import { userDisplayName } from "@/lib/userDisplayName"
 
 const { header } = brandContent
@@ -47,7 +48,10 @@ export default function AppHeader(props: AppHeaderProps) {
   } = props
 
   const router = useRouter()
-  const { user, isLoggedIn, stateService, services } = useServices()
+  const pathname = usePathname() ?? "/"
+  const { user, isLoggedIn, role, stateService, services } = useServices()
+  const showAdminLink = stateService && isLoggedIn && isAdminRole(role)
+  const onAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/")
 
   const onLogout = async () => {
     await services.logout()
@@ -88,15 +92,32 @@ export default function AppHeader(props: AppHeaderProps) {
         <div className="app-header-actions">
           {props.variant === "dashboard" ? (
             <>
+              {showAdminLink && !onAdminRoute ? (
+                <Link href="/admin" className="app-header-btn-ghost-link">
+                  {header.adminLabel}
+                </Link>
+              ) : null}
+              {onAdminRoute ? (
+                <Link href="/dashboard" className="app-header-btn-ghost-link">
+                  {header.dashboardLabel}
+                </Link>
+              ) : null}
               <span className="app-header-user">{userDisplayName(user)}</span>
               <button type="button" className="app-header-btn-ghost" onClick={() => void onLogout()}>
                 {header.logoutLabel}
               </button>
             </>
           ) : stateService && isLoggedIn ? (
-            <Link href="/dashboard" className="app-header-btn-primary">
-              {header.dashboardLabel}
-            </Link>
+            <>
+              {showAdminLink && !onAdminRoute ? (
+                <Link href="/admin" className="app-header-btn-ghost-link">
+                  {header.adminLabel}
+                </Link>
+              ) : null}
+              <Link href="/dashboard" className="app-header-btn-primary">
+                {header.dashboardLabel}
+              </Link>
+            </>
           ) : (
             <>
               <Link href="/sign-in" className="app-header-signin">
@@ -281,6 +302,22 @@ export default function AppHeader(props: AppHeaderProps) {
 
         .app-header-btn-ghost:hover {
           border-color: var(--launch-muted);
+        }
+
+        .app-header-actions :global(.app-header-btn-ghost-link) {
+          background: transparent;
+          border: 1px solid var(--launch-border);
+          color: var(--launch-text);
+          text-decoration: none;
+          font-size: 12px;
+          font-weight: 500;
+          padding: 6px 12px;
+          transition: border-color 0.15s;
+        }
+
+        .app-header-actions :global(.app-header-btn-ghost-link:hover) {
+          border-color: var(--launch-muted);
+          text-decoration: none;
         }
 
         @media (max-width: 640px) {

@@ -8,6 +8,7 @@ export const brandContent = {
     loginLabel: "Entrar",
     signupLabel: "Comenzar",
     dashboardLabel: "Dashboard",
+    adminLabel: "Admin",
     logoutLabel: "Cerrar sesión",
   },
 } as const

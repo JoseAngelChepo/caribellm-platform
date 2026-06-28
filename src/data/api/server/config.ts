@@ -1,5 +1,4 @@
 import axios, { type AxiosError } from "axios"
-import { toast } from "@/lib/toast"
 import auth from "@/data/api/server/auth"
 import { NEXT_PUBLIC_API_BASIC_AUTH, NEXT_PUBLIC_API_URL } from "@/config/env"
 
@@ -108,9 +107,6 @@ ApiServices.interceptors.response.use(
         auth.logout()
         return Promise.reject(error)
       }
-    }
-    if (error.response?.status === 403) {
-      toast.error("You are not authorized to access this resource.")
     }
     return Promise.reject(error)
   },

@@ -11,6 +11,14 @@ import React, {
 import { toast } from "@/lib/toast"
 import createServices, {
   normalizeAuthMeUser,
+  type AdminListUsersParams,
+  type AdminUpdateUserPayload,
+  type AdminUsageSummaryResponse,
+  type AdminWalletListParams,
+  type AdminWalletListResult,
+  type AdminUser,
+  type AdminUserDetail,
+  type AdminUserListResult,
   type ApiKeyListItem,
   type AuthSessionPayload,
   type CreateApiKeyResponse,
@@ -55,6 +63,12 @@ type ServicesContextValue = {
     listApiKeys: () => Promise<ApiKeyListItem[]>
     createApiKey: (name?: string) => Promise<CreateApiKeyResponse>
     revokeApiKey: (id: string) => Promise<void>
+    listAdminUsers: (params?: AdminListUsersParams) => Promise<AdminUserListResult>
+    getAdminUser: (id: string) => Promise<AdminUserDetail>
+    updateAdminUser: (id: string, data: AdminUpdateUserPayload) => Promise<AdminUser>
+    setAdminUserApiKeyAccess: (id: string, canCreateApiKeys: boolean) => Promise<AdminUser>
+    getAdminUsageSummary: () => Promise<AdminUsageSummaryResponse>
+    listAdminWallets: (params?: AdminWalletListParams) => Promise<AdminWalletListResult>
   }
 }
 
@@ -220,6 +234,28 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
     [Services],
   )
   const revokeApiKey = useCallback((id: string) => Services.revokeApiKey(id), [Services])
+  const listAdminUsers = useCallback(
+    (params?: AdminListUsersParams) => Services.listAdminUsers(params),
+    [Services],
+  )
+  const getAdminUser = useCallback((id: string) => Services.getAdminUser(id), [Services])
+  const updateAdminUser = useCallback(
+    (id: string, data: AdminUpdateUserPayload) => Services.updateAdminUser(id, data),
+    [Services],
+  )
+  const setAdminUserApiKeyAccess = useCallback(
+    (id: string, canCreateApiKeys: boolean) =>
+      Services.setAdminUserApiKeyAccess(id, canCreateApiKeys),
+    [Services],
+  )
+  const getAdminUsageSummary = useCallback(
+    () => Services.getAdminUsageSummary(),
+    [Services],
+  )
+  const listAdminWallets = useCallback(
+    (params?: AdminWalletListParams) => Services.listAdminWallets(params),
+    [Services],
+  )
 
   const refreshData = useCallback(async () => {
     const isLogged = auth.isLoggedIn()
@@ -262,6 +298,12 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
         listApiKeys,
         createApiKey,
         revokeApiKey,
+        listAdminUsers,
+        getAdminUser,
+        updateAdminUser,
+        setAdminUserApiKeyAccess,
+        getAdminUsageSummary,
+        listAdminWallets,
       },
     }),
     [
@@ -282,6 +324,12 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
       listApiKeys,
       createApiKey,
       revokeApiKey,
+      listAdminUsers,
+      getAdminUser,
+      updateAdminUser,
+      setAdminUserApiKeyAccess,
+      getAdminUsageSummary,
+      listAdminWallets,
     ],
   )
 

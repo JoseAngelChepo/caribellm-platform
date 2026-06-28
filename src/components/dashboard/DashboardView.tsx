@@ -1,5 +1,6 @@
 "use client"
 
+import axios from "axios"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Loader from "@/components/ui/Loader"
 import UsagePanel from "@/components/dashboard/UsagePanel"
@@ -137,8 +138,12 @@ export default function DashboardView() {
       ])
       toast.success("Clave API creada")
       setActiveTab("api")
-    } catch {
-      toast.error("No se pudo crear la clave API")
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 403) {
+        toast.error("Solicita el acceso en Discord.")
+      } else {
+        toast.error("No se pudo crear la clave API")
+      }
     } finally {
       setCreatingKey(false)
     }
