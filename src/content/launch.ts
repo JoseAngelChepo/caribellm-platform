@@ -27,7 +27,7 @@ export const launchContent = {
   header: {
     loginLabel: "Entrar",
     signupLabel: "Comenzar",
-    dashboardLabel: "Tablero",
+    dashboardLabel: "Dashboard",
   },
   hero: {
     prompt: "caribellm@archipielago:~$",
@@ -36,7 +36,7 @@ export const launchContent = {
     titleAccentHighlight: "comunidad.",
     lede:
       "Acceso gratuito a modelos de IA para quienes construyen herramientas para Venezuela y el Caribe. Contribuye cómputo desde tu navegador o laptop, usa la API compatible con OpenAI — todo open source.",
-    primaryCta: "Ver fases",
+    primaryCta: { label: "Ver fases", href: "#fases" },
     secondaryCta: "Código abierto",
     tags: ["Go gateway", "WebLLM", "libp2p", "Apache 2.0"],
   },

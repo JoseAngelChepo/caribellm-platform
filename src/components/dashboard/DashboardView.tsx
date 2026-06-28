@@ -179,7 +179,7 @@ export default function DashboardView() {
         setTransactions(txs)
         setApiKeys(keys)
       } catch {
-        toast.error("No se pudo cargar el tablero")
+        toast.error("No se pudo cargar el dashboard")
       } finally {
         setLoading(false)
         setRefreshing(false)
@@ -293,7 +293,7 @@ export default function DashboardView() {
     <div className="dash">
       <header className="dash-hero">
         <div className="dash-hero-top">
-          <p className="dash-eyebrow">caribellm@archipielago:~$ tablero</p>
+          <p className="dash-eyebrow">caribellm@archipielago:~$ dashboard</p>
           <button
             type="button"
             className="dash-btn-ghost"
@@ -317,7 +317,7 @@ export default function DashboardView() {
       </header>
 
       <div className="dash-tabs-wrap">
-        <div className="dash-tabs" role="tablist" aria-label="Secciones del tablero">
+        <div className="dash-tabs" role="tablist" aria-label="Secciones del dashboard">
           {DASHBOARD_TABS.map((tab) => {
             const isActive = activeTab === tab.id
             const badge = tab.id === "api" && apiKeys.length > 0 ? apiKeys.length : null
