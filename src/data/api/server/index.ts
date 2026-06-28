@@ -27,12 +27,50 @@ export type UsernameAvailabilityResponse = {
   reason?: string
 }
 
+export type WalletResponse = {
+  id: string
+  userId: string
+  credits: number
+  lifetimePaid: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type TransactionResponse = {
+  id: string
+  type: "TOPUP" | "USAGE" | "BONUS" | "REFUND" | string
+  credits: number
+  usdAmount?: number | null
+  description: string
+  model?: string | null
+  inputTokens?: number | null
+  outputTokens?: number | null
+  requestId?: string | null
+  createdAt: string
+}
+
+export type ApiKeyListItem = {
+  id: string
+  name: string
+  prefix: string
+  lastFourChars: string
+  lastUsedAt: string | null
+  createdAt: string
+}
+
+export type CreateApiKeyResponse = ApiKeyListItem & { key: string }
+
 export type ServicesApi = {
   signUp: (data: SignUpPayload) => Promise<AuthSessionPayload>
   login: (data: LoginPayload) => Promise<AuthSessionPayload>
   getUser: () => Promise<Record<string, unknown> | null>
   logout: () => Promise<unknown>
   checkUsernameAvailability: (username: string) => Promise<UsernameAvailabilityResponse>
+  getWallet: () => Promise<WalletResponse>
+  getTransactions: (limit?: number) => Promise<TransactionResponse[]>
+  listApiKeys: () => Promise<ApiKeyListItem[]>
+  createApiKey: (name?: string) => Promise<CreateApiKeyResponse>
+  revokeApiKey: (id: string) => Promise<void>
 }
 
 function createServices(api: AxiosInstance): ServicesApi {
@@ -60,6 +98,15 @@ function createServices(api: AxiosInstance): ServicesApi {
       if (!refreshToken) return Promise.resolve()
       return api.post("/auth/logout", { refresh_token: refreshToken })
     },
+    getWallet: () => api.get("/credits/wallet").then((r) => r.data as WalletResponse),
+    getTransactions: (limit = 20) =>
+      api
+        .get<TransactionResponse[]>("/credits/transactions", { params: { limit } })
+        .then((r) => r.data),
+    listApiKeys: () => api.get<ApiKeyListItem[]>("/api-keys").then((r) => r.data),
+    createApiKey: (name) =>
+      api.post("/api-keys", { name }).then((r) => r.data as CreateApiKeyResponse),
+    revokeApiKey: (id) => api.delete(`/api-keys/${id}`).then(() => undefined),
   }
 }
 

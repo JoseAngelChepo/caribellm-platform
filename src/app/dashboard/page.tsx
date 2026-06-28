@@ -1,13 +1,15 @@
 "use client"
 
 import AuthGuard from "@/components/auth/AuthGuard"
-import HomeShell from "@/components/layout/HomeShell"
+import DashboardView from "@/components/dashboard/DashboardView"
+import DashboardShell from "@/components/layout/DashboardShell"
 
 export default function DashboardPage() {
   return (
     <AuthGuard>
-      <HomeShell />
+      <DashboardShell>
+        <DashboardView />
+      </DashboardShell>
     </AuthGuard>
   )
 }
-

@@ -49,6 +49,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     setChecking(false)
   }, [isLoggedIn, stateService, pathname, cleanPathname, router])
 
-  if (checking) return <Loader />
+  if (checking) {
+    const isLaunchThemeRoute =
+      cleanPathname === "/sign-in" ||
+      cleanPathname === "/sign-up" ||
+      cleanPathname === "/auth/google/callback" ||
+      cleanPathname.startsWith("/dashboard")
+    return <Loader theme={isLaunchThemeRoute ? "launch" : "default"} />
+  }
   return <>{children}</>
 }

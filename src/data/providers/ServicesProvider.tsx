@@ -11,8 +11,12 @@ import React, {
 import { toast } from "@/lib/toast"
 import createServices, {
   normalizeAuthMeUser,
+  type ApiKeyListItem,
   type AuthSessionPayload,
+  type CreateApiKeyResponse,
+  type TransactionResponse,
   type UsernameAvailabilityResponse,
+  type WalletResponse,
 } from "@/data/api/server"
 import { ApiServices } from "@/data/api/server/config"
 import auth from "@/data/api/server/auth"
@@ -44,10 +48,33 @@ type ServicesContextValue = {
     logout: () => Promise<void>
     getUser: () => Promise<Record<string, unknown> | false | null>
     refreshUser: () => Promise<Record<string, unknown> | false | null>
+    getWallet: () => Promise<WalletResponse>
+    getTransactions: (limit?: number) => Promise<TransactionResponse[]>
+    listApiKeys: () => Promise<ApiKeyListItem[]>
+    createApiKey: (name?: string) => Promise<CreateApiKeyResponse>
+    revokeApiKey: (id: string) => Promise<void>
   }
 }
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(undefined)
+
+function getApiErrorMessage(err: unknown, fallback: string): string {
+  if (
+    err &&
+    typeof err === "object" &&
+    "response" in err &&
+    err.response &&
+    typeof err.response === "object" &&
+    "data" in err.response &&
+    err.response.data &&
+    typeof err.response.data === "object"
+  ) {
+    const message = (err.response.data as { message?: string | string[] }).message
+    if (Array.isArray(message)) return message.join(", ")
+    if (typeof message === "string" && message.length > 0) return message
+  }
+  return fallback
+}
 
 export function ServicesProvider({ children }: { children: React.ReactNode }) {
   const [stateService, setStateService] = useState(false)
@@ -71,22 +98,7 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
   const getUser = useCallback(async () => {
     try {
       return await Services.getUser()
-    } catch (err: unknown) {
-      const message =
-        err &&
-        typeof err === "object" &&
-        "response" in err &&
-        err.response &&
-        typeof err.response === "object" &&
-        "data" in err.response &&
-        err.response.data &&
-        typeof err.response.data === "object" &&
-        "message" in err.response.data
-          ? String((err.response.data as { message?: string }).message)
-          : "An error occurred while getting user"
-      // TODO: re-enable when backend is connected
-      // toast.error(message)
-      void message
+    } catch {
       return false
     }
   }, [Services])
@@ -127,8 +139,8 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
             : null,
         )
         return data
-      } catch {
-        toast.error("Sign up failed")
+      } catch (err: unknown) {
+        toast.error(getApiErrorMessage(err, "No se pudo crear la cuenta"))
         return false
       }
     },
@@ -151,8 +163,8 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
             : null,
         )
         return data
-      } catch {
-        toast.error("Invalid email or password")
+      } catch (err: unknown) {
+        toast.error(getApiErrorMessage(err, "Correo o contraseña incorrectos"))
         return false
       }
     },
@@ -194,23 +206,34 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }, [Services])
 
+  const getWallet = useCallback(() => Services.getWallet(), [Services])
+  const getTransactions = useCallback(
+    (limit?: number) => Services.getTransactions(limit),
+    [Services],
+  )
+  const listApiKeys = useCallback(() => Services.listApiKeys(), [Services])
+  const createApiKey = useCallback(
+    (name?: string) => Services.createApiKey(name),
+    [Services],
+  )
+  const revokeApiKey = useCallback((id: string) => Services.revokeApiKey(id), [Services])
+
   const refreshData = useCallback(async () => {
     const isLogged = auth.isLoggedIn()
     if (isLogged) {
       setIsLoggedIn(true)
-      // TODO: re-enable when backend is connected
-      // const userData = await getUser()
-      // if (userData && typeof userData === "object") {
-      //   setUser(userData)
-      //   setRole(userData.role != null ? String(userData.role) : null)
-      // }
+      const userData = await getUser()
+      if (userData && typeof userData === "object") {
+        setUser(userData)
+        setRole(userData.role != null ? String(userData.role) : null)
+      }
     } else {
       setUser(null)
       setRole(null)
       setIsLoggedIn(false)
     }
     setStateService(true)
-  }, [])
+  }, [getUser])
 
   useEffect(() => {
     void refreshData()
@@ -230,6 +253,11 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
         logout,
         getUser,
         refreshUser,
+        getWallet,
+        getTransactions,
+        listApiKeys,
+        createApiKey,
+        revokeApiKey,
       },
     }),
     [
@@ -244,6 +272,11 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
       logout,
       getUser,
       refreshUser,
+      getWallet,
+      getTransactions,
+      listApiKeys,
+      createApiKey,
+      revokeApiKey,
     ],
   )
 

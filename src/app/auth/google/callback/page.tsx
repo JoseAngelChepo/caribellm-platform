@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "@/lib/toast"
 import AuthGuard from "@/components/auth/AuthGuard"
+import AuthShell from "@/components/auth/AuthShell"
 import Loader from "@/components/ui/Loader"
 import { useServices } from "@/data/providers/ServicesProvider"
 
@@ -24,7 +25,7 @@ function GoogleCallbackContent() {
       const refresh = searchParams.get("refresh")
       const role = searchParams.get("role")
       if (!token || !refresh) {
-        toast.error("No tokens received from Google login")
+        toast.error("No se recibieron tokens de Google")
         router.push("/sign-in")
         return
       }
@@ -54,15 +55,23 @@ function GoogleCallbackContent() {
     void handleGoogleCallback()
   }, [searchParams, router, loginGoogle])
 
-  return <p className="page-status">Signing you in…</p>
+  return (
+    <div className="auth-form auth-form--centered">
+      <p className="auth-eyebrow">caribellm@archipielago:~$ oauth</p>
+      <p className="auth-lede">Iniciando sesión con Google…</p>
+      <Loader compact theme="launch" />
+    </div>
+  )
 }
 
 export default function GoogleCallbackPage() {
   return (
     <AuthGuard>
-      <Suspense fallback={<Loader />}>
-        <GoogleCallbackContent />
-      </Suspense>
+      <AuthShell>
+        <Suspense fallback={<Loader compact theme="launch" />}>
+          <GoogleCallbackContent />
+        </Suspense>
+      </AuthShell>
     </AuthGuard>
   )
 }

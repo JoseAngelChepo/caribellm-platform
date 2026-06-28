@@ -5,8 +5,8 @@ type Props = {
   className?: string
   onClick?: () => void
   type?: "button" | "submit" | "reset"
-  /** Primary CTA; default is neutral secondary. */
-  variant?: "default" | "primary"
+  /** Primary CTA; default is neutral secondary. `launch` matches the dark landing/auth theme. */
+  variant?: "default" | "primary" | "launch"
 }
 
 export default function Button({
@@ -18,7 +18,12 @@ export default function Button({
   type = "button",
   variant = "default",
 }: Props) {
-  const variantClass = variant === "primary" ? "btn--primary" : "btn--secondary"
+  const variantClass =
+    variant === "launch"
+      ? "btn--launch"
+      : variant === "primary"
+        ? "btn--primary"
+        : "btn--secondary"
   return (
     <button
       className={`btn ${variantClass} ${className}`.trim()}
@@ -69,6 +74,19 @@ export default function Button({
         .btn--primary:hover:not(:disabled) {
           background: var(--app-primary-hover);
           border-color: var(--app-primary-hover);
+        }
+        .btn--launch {
+          margin-top: 8px;
+          background: #00cfbd;
+          color: #080b0b;
+          border: 1px solid #00cfbd;
+          font-weight: 700;
+          border-radius: 0;
+        }
+        .btn--launch:hover:not(:disabled) {
+          background: #008f82;
+          border-color: #008f82;
+          color: #fff;
         }
         .btn:disabled {
           opacity: 0.55;

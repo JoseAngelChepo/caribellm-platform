@@ -1,9 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { launchContent } from "@/content/launch"
+import { useServices } from "@/data/providers/ServicesProvider"
 import type { LaunchPhaseStatus } from "@/content/launch"
 
-const { brand, hero, mission, phases, footer } = launchContent
+const { brand, header, hero, mission, phases, footer } = launchContent
 
 const statusLabels: Record<LaunchPhaseStatus, string> = {
   launching: "En lanzamiento",
@@ -21,6 +23,7 @@ function GitHubIcon() {
 
 export default function LaunchPage() {
   const year = new Date().getFullYear()
+  const { isLoggedIn, stateService } = useServices()
 
   return (
     <div className="page">
@@ -50,6 +53,22 @@ export default function LaunchPage() {
               </a>
             </li>
           </ul>
+          <div className="nav-actions">
+            {stateService && isLoggedIn ? (
+              <Link href="/dashboard" className="btn-nav-primary">
+                {header.dashboardLabel}
+              </Link>
+            ) : (
+              <>
+                <Link href="/sign-in" className="nav-signin">
+                  {header.loginLabel}
+                </Link>
+                <Link href="/sign-up" className="btn-nav-primary">
+                  {header.signupLabel}
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -67,9 +86,9 @@ export default function LaunchPage() {
           <p className="hero-sub">{hero.lede}</p>
 
           <div className="hero-actions">
-            <a href={`#${phases.id}`} className="btn-primary">
-              {hero.primaryCta}
-            </a>
+            <Link href={hero.primaryCta.href} className="btn-primary">
+              {hero.primaryCta.label}
+            </Link>
             <a
               href={footer.github}
               className="btn-ghost"
@@ -225,6 +244,7 @@ export default function LaunchPage() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 16px;
         }
 
         .nav-logo {
@@ -270,6 +290,43 @@ export default function LaunchPage() {
         .nav-links :global(.gh) {
           color: var(--launch-text);
           font-weight: 500;
+        }
+
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .nav-actions :global(.nav-signin) {
+          color: var(--launch-muted);
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 500;
+          padding: 6px 10px;
+          transition: color 0.15s;
+        }
+
+        .nav-actions :global(.nav-signin:hover) {
+          color: var(--launch-text);
+          text-decoration: none;
+        }
+
+        .nav-actions :global(.btn-nav-primary) {
+          background: var(--launch-accent);
+          color: #080b0b;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 700;
+          padding: 7px 14px;
+          transition: background 0.15s;
+        }
+
+        .nav-actions :global(.btn-nav-primary:hover) {
+          background: var(--launch-dim);
+          color: #fff;
+          text-decoration: none;
         }
 
         /* ── LAYOUT ── */
@@ -655,7 +712,11 @@ export default function LaunchPage() {
         /* ── RESPONSIVE ── */
         @media (max-width: 640px) {
           .nav-links {
-            gap: 18px;
+            display: none;
+          }
+
+          .nav-actions :global(.nav-signin) {
+            display: none;
           }
 
           .term-demo {

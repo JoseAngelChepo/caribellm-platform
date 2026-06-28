@@ -24,6 +24,11 @@ export const launchContent = {
     accent: "LLM",
     sub: "archipielago",
   },
+  header: {
+    loginLabel: "Entrar",
+    signupLabel: "Comenzar",
+    dashboardLabel: "Tablero",
+  },
   hero: {
     prompt: "caribellm@archipielago:~$",
     title: "IA accesible,",

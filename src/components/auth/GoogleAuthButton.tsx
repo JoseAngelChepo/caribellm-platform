@@ -1,11 +1,13 @@
 type Props = {
   text: string
   onClick: () => void
+  variant?: "default" | "launch"
 }
 
-export default function GoogleAuthButton({ text, onClick }: Props) {
+export default function GoogleAuthButton({ text, onClick, variant = "default" }: Props) {
+  const launchClass = variant === "launch" ? " btn-google--launch" : ""
   return (
-    <button className="btn-google" type="button" onClick={onClick}>
+    <button className={`btn-google${launchClass}`} type="button" onClick={onClick}>
       <img
         className="btn-google__icon"
         src="/google-icon.png"
@@ -40,6 +42,17 @@ export default function GoogleAuthButton({ text, onClick }: Props) {
           background: var(--app-surface-muted);
           border-color: var(--app-border-strong);
           box-shadow: var(--app-shadow-sm);
+        }
+        .btn-google--launch {
+          color: #e8edec;
+          background: #080b0b;
+          border: 1px solid #1c2424;
+          border-radius: 0;
+        }
+        .btn-google--launch:hover {
+          background: #0f1414;
+          border-color: #4a5a58;
+          box-shadow: none;
         }
         .btn-google__icon {
           width: 20px;

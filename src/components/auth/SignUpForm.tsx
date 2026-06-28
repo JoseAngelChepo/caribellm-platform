@@ -8,6 +8,7 @@ import { toast } from "@/lib/toast"
 import Button from "@/components/ui/Button"
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton"
 import { useServices } from "@/data/providers/ServicesProvider"
+import { useMessages } from "@/i18n/client"
 import { NEXT_PUBLIC_API_URL } from "@/config/env"
 import {
   isUsernameFormatValid,
@@ -36,6 +37,7 @@ export default function SignUpForm() {
   const {
     services: { signUp, checkUsernameAvailability },
   } = useServices()
+  const messages = useMessages()
   const {
     register,
     handleSubmit,
@@ -87,7 +89,7 @@ export default function SignUpForm() {
     if (!isUsernameFormatValid(username)) {
       setError("username", {
         type: "manual",
-        message: `Use ${USERNAME_MIN}–${USERNAME_MAX} characters: lowercase a–z, digits, underscore only`,
+        message: `Usa ${USERNAME_MIN}–${USERNAME_MAX} caracteres: a–z minúsculas, dígitos y guion bajo`,
       })
       return
     }
@@ -98,7 +100,7 @@ export default function SignUpForm() {
       if (!check.valid) {
         setError("username", {
           type: "manual",
-          message: check.reason || "Invalid username",
+          message: check.reason || "Nombre de usuario inválido",
         })
         setIsLoading(false)
         return
@@ -106,7 +108,7 @@ export default function SignUpForm() {
       if (!check.available) {
         setError("username", {
           type: "manual",
-          message: check.reason || "Username is already taken",
+          message: check.reason || "Ese nombre de usuario ya está en uso",
         })
         setIsLoading(false)
         return
@@ -120,13 +122,13 @@ export default function SignUpForm() {
         password: data.password,
       })
       if (response) {
-        toast.success("Account created")
+        toast.success("Cuenta creada")
         router.push(redirectPath || "/dashboard")
       }
     } catch {
       setError("root", {
         type: "manual",
-        message: "Could not create your account. Try again.",
+        message: "No se pudo crear tu cuenta. Intenta de nuevo.",
       })
     } finally {
       setIsLoading(false)
@@ -146,67 +148,70 @@ export default function SignUpForm() {
 
   return (
     <div className="auth-form">
-      <h1 className="auth-title">Create account</h1>
-      <p className="auth-lede">Create your account to get started.</p>
+      <p className="auth-eyebrow">caribellm@archipielago:~$ sign-up</p>
+      <h1 className="auth-title">{messages.auth.signUp.title}</h1>
+      <p className="auth-lede">{messages.auth.signUp.lede}</p>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="auth-fields">
-          <div>
-            <input
-              {...register("firstName", { required: "Required" })}
-              className="auth-input"
-              placeholder="First name"
-              autoComplete="given-name"
-            />
-            {errors.firstName && <p className="auth-error">{errors.firstName.message}</p>}
-          </div>
-          <div>
-            <input
-              {...register("lastName", { required: "Required" })}
-              className="auth-input"
-              placeholder="Last name"
-              autoComplete="family-name"
-            />
-            {errors.lastName && <p className="auth-error">{errors.lastName.message}</p>}
+          <div className="auth-row">
+            <div>
+              <input
+                {...register("firstName", { required: "Obligatorio" })}
+                className="auth-input"
+                placeholder="Nombre"
+                autoComplete="given-name"
+              />
+              {errors.firstName && <p className="auth-error">{errors.firstName.message}</p>}
+            </div>
+            <div>
+              <input
+                {...register("lastName", { required: "Obligatorio" })}
+                className="auth-input"
+                placeholder="Apellido"
+                autoComplete="family-name"
+              />
+              {errors.lastName && <p className="auth-error">{errors.lastName.message}</p>}
+            </div>
           </div>
           <div>
             <input
               {...register("username", {
-                required: "Username is required",
+                required: "El usuario es obligatorio",
                 validate: (value) => {
                   const u = normalizeUsername(value)
                   if (u.length < USERNAME_MIN) {
-                    return `At least ${USERNAME_MIN} characters`
+                    return `Mínimo ${USERNAME_MIN} caracteres`
                   }
                   if (u.length > USERNAME_MAX) {
-                    return `At most ${USERNAME_MAX} characters`
+                    return `Máximo ${USERNAME_MAX} caracteres`
                   }
                   if (!isUsernameFormatValid(u)) {
-                    return "Only lowercase letters, digits, and underscore (a–z, 0–9, _)"
+                    return "Solo a–z minúsculas, dígitos y guion bajo (a–z, 0–9, _)"
                   }
                   return true
                 },
                 onChange: () => clearErrors("username"),
               })}
               className="auth-input"
-              placeholder="username"
+              placeholder="usuario"
               autoComplete="username"
               spellCheck={false}
             />
             {errors.username && <p className="auth-error">{errors.username.message}</p>}
             {!errors.username && usernameNorm.length > 0 && usernameNorm.length < USERNAME_MIN && (
               <p className="auth-hint auth-hint--muted">
-                {USERNAME_MIN}–{USERNAME_MAX} chars · a–z 0–9 _
+                {USERNAME_MIN}–{USERNAME_MAX} · a–z 0–9 _
               </p>
             )}
             {!errors.username &&
               usernameNorm.length >= USERNAME_MIN &&
               !isUsernameFormatValid(usernameNorm) && (
                 <p className="auth-hint auth-hint--warn">
-                  Invalid characters — use a–z, digits, underscore only
+                  Caracteres inválidos — usa a–z, dígitos y guion bajo
                 </p>
               )}
             {!errors.username && isUsernameFormatValid(usernameNorm) && availabilityChecking && (
-              <p className="auth-hint auth-hint--muted">Checking availability…</p>
+              <p className="auth-hint auth-hint--muted">Comprobando disponibilidad…</p>
             )}
             {!errors.username &&
               isUsernameFormatValid(usernameNorm) &&
@@ -215,7 +220,7 @@ export default function SignUpForm() {
               normalizeUsername(availability.username) === usernameNorm &&
               availability.valid &&
               availability.available && (
-                <p className="auth-hint auth-hint--ok">Username available</p>
+                <p className="auth-hint auth-hint--ok">Usuario disponible</p>
               )}
             {!errors.username &&
               isUsernameFormatValid(usernameNorm) &&
@@ -225,22 +230,22 @@ export default function SignUpForm() {
               (!availability.valid || !availability.available) && (
                 <p className="auth-hint auth-hint--warn">
                   {availability.reason ||
-                    (!availability.available ? "Username taken" : "Invalid username")}
+                    (!availability.available ? "Usuario en uso" : "Usuario inválido")}
                 </p>
               )}
           </div>
           <div>
             <input
               {...register("email", {
-                required: "Email is required",
+                required: "El correo es obligatorio",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Enter a valid email",
+                  message: "Ingresa un correo válido",
                 },
               })}
               className="auth-input"
               type="email"
-              placeholder="you@company.com"
+              placeholder="tu@correo.com"
               autoComplete="email"
             />
             {errors.email && <p className="auth-error">{errors.email.message}</p>}
@@ -249,19 +254,19 @@ export default function SignUpForm() {
             <div className="auth-password-wrap">
               <input
                 {...register("password", {
-                  required: "Password is required",
-                  minLength: { value: 8, message: "At least 8 characters" },
+                  required: "La contraseña es obligatoria",
+                  minLength: { value: 8, message: "Mínimo 8 caracteres" },
                 })}
                 className="auth-input"
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder="Contraseña"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 className="auth-password-toggle"
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 {showPassword ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
               </button>
@@ -272,19 +277,19 @@ export default function SignUpForm() {
             <div className="auth-password-wrap">
               <input
                 {...register("confirmPassword", {
-                  required: "Confirm your password",
-                  validate: (value) => value === password || "Passwords must match",
+                  required: "Confirma tu contraseña",
+                  validate: (value) => value === password || "Las contraseñas no coinciden",
                 })}
                 className="auth-input"
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm password"
+                placeholder="Confirmar contraseña"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 className="auth-password-toggle"
                 onClick={() => setShowConfirmPassword((v) => !v)}
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 {showConfirmPassword ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
               </button>
@@ -296,20 +301,20 @@ export default function SignUpForm() {
           {errors.root && <div className="auth-root-error">{errors.root.message}</div>}
           <Button
             type="submit"
-            variant="primary"
+            variant="launch"
             loading={isSubmitting || isLoading}
             disabled={isSubmitting || isLoading}
           >
-            Create account
+            Crear cuenta
           </Button>
         </div>
       </form>
       <div className="auth-divider" role="separator">
-        <span>Or</span>
+        <span>o</span>
       </div>
-      <GoogleAuthButton text="Sign up with Google" onClick={onGoogleSignUp} />
+      <GoogleAuthButton variant="launch" text="Registrarse con Google" onClick={onGoogleSignUp} />
       <button type="button" className="auth-footer" onClick={() => router.push(signInPath)}>
-        Sign in instead
+        ¿Ya tienes cuenta? Iniciar sesión
       </button>
     </div>
   )

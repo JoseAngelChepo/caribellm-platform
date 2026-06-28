@@ -7,6 +7,10 @@ export const NEXT_PUBLIC_API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   (isProduction ? "https://[SETUP-REQUIRED]/api/v1" : "http://localhost:3001/api/v1")
 
+export const NEXT_PUBLIC_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_GATEWAY_URL ||
+  (isProduction ? "https://[SETUP-REQUIRED]" : "http://localhost:8080")
+
 /** `username:password` for unauthenticated requests when your API requires HTTP Basic. */
 export const NEXT_PUBLIC_API_BASIC_AUTH =
   process.env.NEXT_PUBLIC_API_BASIC_AUTH?.trim() || undefined

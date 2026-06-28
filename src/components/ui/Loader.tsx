@@ -3,16 +3,19 @@ type Props = {
   compact?: boolean
   /** Small spinner for tight panels. */
   inline?: boolean
+  /** Dark theme matching launch/auth pages. */
+  theme?: "default" | "launch"
 }
 
-export default function Loader({ compact = false, inline = false }: Props) {
+export default function Loader({ compact = false, inline = false, theme = "default" }: Props) {
   const wrapClass = inline
     ? " loader-wrap--inline"
     : compact
       ? " loader-wrap--compact"
       : ""
+  const themeClass = theme === "launch" ? " loader-wrap--launch" : ""
   return (
-    <div className={`loader-wrap${wrapClass}`}>
+    <div className={`loader-wrap${wrapClass}${themeClass}`}>
       <div className="loader-spinner" aria-hidden />
       <style jsx>{`
         .loader-wrap {
@@ -49,6 +52,17 @@ export default function Loader({ compact = false, inline = false }: Props) {
           width: 1.25rem;
           height: 1.25rem;
           border-width: 2px;
+        }
+        .loader-wrap--launch {
+          background: #080b0b;
+        }
+        .loader-wrap--launch .loader-spinner {
+          border-color: #1c2424;
+          border-top-color: #00cfbd;
+        }
+        .loader-wrap--launch.loader-wrap--compact,
+        .loader-wrap--launch.loader-wrap--inline {
+          background: transparent;
         }
         @keyframes spin {
           to {
