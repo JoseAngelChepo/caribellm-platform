@@ -21,3 +21,14 @@ export const brandMarkStrokes = [
     width: 2,
   },
 ] as const
+
+export function renderBrandMarkSvg(color = brandMarkColor): string {
+  const paths = brandMarkStrokes
+    .map(
+      (stroke) =>
+        `<path d="${stroke.d}" stroke="${color}" stroke-width="${stroke.width}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+    )
+    .join("")
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${brandMarkViewBox}" fill="none" role="img" aria-label="CaribeLLM">${paths}</svg>`
+}
